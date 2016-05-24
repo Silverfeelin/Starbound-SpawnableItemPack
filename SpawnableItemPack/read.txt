@@ -1,0 +1,5 @@
+btnSIP Activator
+sipItemScroll
+ sipItemList
+  background, itemName, itemIcon, rarityIcon
+sipLabelSelectItem

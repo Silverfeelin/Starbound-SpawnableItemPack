@@ -17,6 +17,67 @@
 		} 
 	},
   {
+   "op" : "add",
+   "path" : "/gui/sipItemScroll",
+   "value" : {
+      "type" : "scrollArea",
+      "zlevel" : 20,
+      "rect" : [2, 2, 180, 168],
+      "children" : {
+        "sipItemList" : {
+          "type" : "list",
+          "schema" : {
+            "selectedBG" : "/interface/crafting/craftableselected.png",
+            "unselectedBG" : "/interface/crafting/craftablebackground.png",
+            "spacing" : [0, 1],
+            "memberSize" : [156, 20],
+            "listTemplate" : {
+              "background" : {
+                "type" : "image",
+                "file" : "/interface/sip/itembackground.png",
+                "position" : [0, 0],
+                "zlevel" : -1
+              },
+              "itemName" : {
+                "type" : "label",
+                "position" : [25, 5],
+                "hAnchor" : "left",
+                "wrapWidth" : 116,
+                "value" : "Replace Me"
+              },
+              "itemIcon" : {
+                "type" : "image",
+                "file" : "/assetMissing.png",
+                "position" : [0,1],
+                "zlevel" : 0,
+                "visible" : true
+              },
+              "rarityIcon" : {
+                "type" : "image",
+                "file" : "/assetMissing.png",
+                "position" : [0,1],
+                "zlevel" : 0,
+                "visible" : true
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+	"op" : "add",
+	"path" : "/gui/sipLabelSelectItem",
+	"value" : {
+      "type" : "label",
+      "position" : [54, 196],
+      "hAnchor" : "mid",
+      "vAnchor" : "bottom",
+      "value" : "^white;^shadow;Select an item"
+		}
+	},
+  
+  {
     "op": "add",
     "path": "/packages/-",
     "value": {
@@ -34,6 +95,11 @@
   {
     "op": "add",
     "path": "/scriptWidgetCallbacks/-",
-    "value": "sip.test"
+    "value": "sip.search"
+  },
+  {
+    "op": "add",
+    "path": "/scriptWidgetCallbacks/-",
+    "value": "sip.categorySelected"
   }
 ]
