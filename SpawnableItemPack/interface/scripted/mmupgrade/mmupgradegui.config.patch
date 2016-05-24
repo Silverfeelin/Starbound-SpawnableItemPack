@@ -1,0 +1,39 @@
+[
+  {
+	"op" : "add",
+	"path" : "/gui/btnSIP",
+	"value" : {
+			"type" : "button",
+			"base" : "/interface/sip/muiSIP.png",
+			"hover" : "/interface/sip/muiSIP.png?brightness=60",
+			"caption" : "^shadow;Open Spawnable\nItem Pack",
+			"fontSize" : 7,
+			"wrapWidth" : 80,
+			"hAnchor" : "mid",
+			"pressedOffset" : [0, -1],
+			"position" : [102, 103],
+			"data" : "spawnableItemPack",
+			"callback" : "showInterface"
+		} 
+	},
+  {
+    "op": "add",
+    "path": "/packages/-",
+    "value": {
+			"activator" : "btnSIP",
+			"show" : [],
+			"hide" : [],
+      "settingControls" : [],
+			"update" : {},
+			"name" : "spawnableItemPack",
+			"script" : "/scripts/spawnableItemPack.lua"
+		
+		}
+  },
+
+  {
+    "op": "add",
+    "path": "/scriptWidgetCallbacks/-",
+    "value": "sip.test"
+  }
+]
