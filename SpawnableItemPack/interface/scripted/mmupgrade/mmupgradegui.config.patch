@@ -1,63 +1,108 @@
 [
   {
-	"op" : "add",
-	"path" : "/gui/btnSIP",
-	"value" : {
-			"type" : "button",
-			"base" : "/interface/sip/muiSIP.png",
-			"hover" : "/interface/sip/muiSIP.png?brightness=60",
-			"caption" : "^shadow;Open Spawnable\nItem Pack",
-			"fontSize" : 7,
-			"wrapWidth" : 80,
-			"hAnchor" : "mid",
-			"pressedOffset" : [0, -1],
-			"position" : [102, 103],
-			"data" : "spawnableItemPack",
-			"callback" : "showInterface"
-		} 
-	},
+    "op": "add",
+    "path": "/gui/btnSIP",
+    "value": {
+      "type": "button",
+      "base": "/interface/sip/muiSIP.png",
+      "hover": "/interface/sip/muiSIP.png?brightness=30",
+      "caption": "^shadow;Open Spawnable\nItem Pack",
+      "fontSize": 7,
+      "wrapWidth": 80,
+      "zlevel": 20,
+      "hAnchor": "mid",
+      "pressedOffset": [
+        0,
+        -1
+      ],
+      "position": [
+        102,
+        103
+      ],
+      "data": "spawnableItemPack",
+      "callback": "showInterface"
+    }
+  },
   {
-   "op" : "add",
-   "path" : "/gui/sipItemScroll",
-   "value" : {
-      "type" : "scrollArea",
-      "zlevel" : 20,
-      "rect" : [2, 2, 180, 168],
-      "children" : {
-        "sipItemList" : {
-          "type" : "list",
-          "schema" : {
-            "selectedBG" : "/interface/crafting/craftableselected.png",
-            "unselectedBG" : "/interface/crafting/craftablebackground.png",
-            "spacing" : [0, 1],
-            "memberSize" : [156, 20],
-            "listTemplate" : {
-              "background" : {
-                "type" : "image",
-                "file" : "/interface/sip/itembackground.png",
-                "position" : [0, 0],
-                "zlevel" : -1
+    "op": "add",
+    "path": "/gui/sipLabelSelectItem",
+    "value": {
+      "type": "label",
+      "position": [
+        85,
+        208
+      ],
+      "hAnchor": "mid",
+      "vAnchor": "bottom",
+      "zlevel": 20,
+      "value": "^white;^shadow;Select an item"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipItemScroll",
+    "value": {
+      "type": "scrollArea",
+      "zlevel": 20,
+      "rect": [
+        4,
+        42,
+        173,
+        207
+      ],
+      "children": {
+        "sipItemList": {
+          "type": "list",
+          "schema": {
+            "selectedBG": "/interface/sip/itemselected.png",
+            "unselectedBG": "/interface/sip/itembackground.png",
+            "spacing": [
+              0,
+              1
+            ],
+            "memberSize": [
+              160,
+              20
+            ],
+            "listTemplate": {
+              "background": {
+                "type": "image",
+                "file": "/interface/sip/itembackground.png",
+                "position": [
+                  0,
+                  0
+                ],
+                "zlevel": -1
               },
-              "itemName" : {
-                "type" : "label",
-                "position" : [25, 5],
-                "hAnchor" : "left",
-                "wrapWidth" : 116,
-                "value" : "Replace Me"
+              "itemName": {
+                "type": "label",
+                "position": [
+                  25,
+                  5
+                ],
+                "hAnchor": "left",
+                "wrapWidth": 116,
+                "value": "Replace Me"
               },
-              "itemIcon" : {
-                "type" : "image",
-                "file" : "/assetMissing.png",
-                "position" : [0,1],
-                "zlevel" : 0,
-                "visible" : true
+              "itemIcon": {
+                "type": "image",
+                "file": "/assetMissing.png",
+                "position": [
+                  0,
+                  1
+                ],
+                "zlevel": 0,
+                "visible": true
               },
-              "rarityIcon" : {
-                "type" : "image",
-                "file" : "/assetMissing.png",
-                "position" : [0,1],
-                "zlevel" : 0,
-                "visible" : true
+              "rarityIcon": {
+                "type": "image",
+                "file": "/assetMissing.png",
+                "position": [
+                  0,
+                  1
+                ],
+                "zlevel": 0,
+                "visible": true
               }
             }
           }
@@ -66,40 +111,218 @@
     }
   },
   {
-	"op" : "add",
-	"path" : "/gui/sipLabelSelectItem",
-	"value" : {
-      "type" : "label",
-      "position" : [54, 196],
-      "hAnchor" : "mid",
-      "vAnchor" : "bottom",
-      "value" : "^white;^shadow;Select an item"
-		}
-	},
-  
-  {
     "op": "add",
-    "path": "/packages/-",
+    "path": "/gui/sipButtonFirstPage",
     "value": {
-			"activator" : "btnSIP",
-			"show" : [],
-			"hide" : [],
-      "settingControls" : [],
-			"update" : {},
-			"name" : "spawnableItemPack",
-			"script" : "/scripts/spawnableItemPack.lua"
-		
-		}
+      "type": "button",
+      "base": "/interface/sip/firstpage.png",
+      "hover": "/interface/sip/firstpage.png?brightness=30",
+      "caption": "^shadow;^white; <<",
+      "fontSize": 7,
+      "wrapWidth": 80,
+      "hAnchor": "mid",
+      "pressedOffset": [
+        0,
+        -1
+      ],
+      "position": [
+        92,
+        27
+      ],
+      "zlevel": 20,
+      "data": -2,
+      "callback": "sip.changePage"
+    }
   },
-
   {
     "op": "add",
-    "path": "/scriptWidgetCallbacks/-",
-    "value": "sip.search"
+    "path": "/gui/sipButtonPreviousPage",
+    "value": {
+      "type": "button",
+      "base": "/interface/sip/switchpage.png",
+      "hover": "/interface/sip/switchpage.png?brightness=30",
+      "caption": "^shadow;^white;<",
+      "fontSize": 7,
+      "wrapWidth": 80,
+      "hAnchor": "mid",
+      "pressedOffset": [
+        0,
+        -1
+      ],
+      "position": [
+        102,
+        27
+      ],
+      "zlevel": 20,
+      "data": -1,
+      "callback": "sip.changePage"
+    }
   },
   {
     "op": "add",
-    "path": "/scriptWidgetCallbacks/-",
-    "value": "sip.categorySelected"
-  }
-]
+    "path": "/gui/sipImagePageDisplay",
+    "value": {
+      "type": "image",
+      "file": "/interface/sip/page.png",
+      "position": [
+        109,
+        27
+      ],
+      "zlevel": 20,
+      "visible": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipButtonNextPage",
+    "value": {
+      "type": "button",
+      "base": "/interface/sip/switchpage.png",
+      "hover": "/interface/sip/switchpage.png?brightness=30",
+      "caption": "^shadow;^white;>",
+      "fontSize": 7,
+      "wrapWidth": 80,
+      "hAnchor": "mid",
+      "pressedOffset": [
+        0,
+        -1
+      ],
+      "position": [
+        152,
+        27
+      ],
+      "zlevel": 20,
+      "data": 1,
+      "callback": "sip.changePage"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipButtonLastPage",
+    "value": {
+      "type": "button",
+      "base": "/interface/sip/lastpage.png",
+      "hover": "/interface/sip/lastpage.png?brightness=30",
+      "caption": "^shadow;^white;>>",
+      "fontSize": 7,
+      "wrapWidth": 80,
+      "hAnchor": "mid",
+      "zlevel": 20,
+      "pressedOffset": [
+        0,
+        -1
+      ],
+      "position": [
+        159,
+        27
+      ],
+      "data": 2,
+      "callback": "sip.changePage"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipButtonPrint",
+    "value": {
+      "type": "button",
+      "base": "/interface/sip/print.png",
+      "hover": "/interface/sip/print.png?brightness=30",
+      "caption": "",
+      "fontSize": 7,
+      "wrapWidth": 80,
+      "hAnchor": "mid",
+      "zlevel": 20,
+      "pressedOffset": [
+        0,
+        -1
+      ],
+      "position": [
+        212,
+        25
+      ],
+      "callback": "sip.print"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipImagePrintAmount",
+    "value": {
+      "type": "image",
+      "file": "/interface/sip/printamount.png",
+      "position": [
+        226,
+        45
+      ],
+      "zlevel": 20,
+      "visible": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipImageSearch",
+    "value": {
+      "type": "image",
+      "file": "/interface/sip/search.png",
+      "position": [
+        6,
+        28
+      ],
+      "zlevel": 20,
+      "visible": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipTextSearch",
+    "value": {
+      "type": "textbox",
+      "position": [
+        10,
+        28
+      ],
+      "textAlign": "left",
+      "hint": "Search",
+      "zlevel": 21,
+      "callback": "sip.search",
+      "maxWidth": 75,
+      "regex": "[a-zA-Z0-9 '-?!.]{0,28}"
+      }
+    },
+    {
+      "op": "add",
+      "path": "/packages/-",
+      "value": {
+        "activator": "btnSIP",
+        "show": ["sipLabelSelectItem", "sipItemScroll", "sipButtonFirstPage", "sipButtonPreviousPage", "sipImagePageDisplay", "sipButtonNextPage", "sipButtonLastPage", "sipButtonPrint", "sipImageSearch", "sipTextSearch", "sipImagePrintAmount"],
+        "hide": [],
+        "settingControls": [],
+        "update": {
+          "bgb": "/interface/sip/body.png",
+          "bgh": "/interface/sip/header.png",
+          "bgf": "/interface/sip/footer.png"
+        },
+        "name": "spawnableItemPack",
+        "script": "/scripts/spawnableItemPack.lua"
+      }
+    },
+    {
+      "op": "add",
+      "path": "/scriptWidgetCallbacks/-",
+      "value": "sip.search"
+    },
+    {
+      "op": "add",
+      "path": "/scriptWidgetCallbacks/-",
+      "value": "sip.categorySelected"
+    },
+    {
+      "op": "add",
+      "path": "/scriptWidgetCallbacks/-",
+      "value": "sip.changePage"
+    },
+    {
+      "op": "add",
+      "path": "/scriptWidgetCallbacks/-",
+      "value": "sip.print"
+    }
+  ]

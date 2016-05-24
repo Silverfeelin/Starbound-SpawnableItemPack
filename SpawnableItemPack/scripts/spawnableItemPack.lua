@@ -6,6 +6,8 @@ function sip.init()
   mui.setIcon("/interface/sip/icon.png")
   sip.items = {}
   sip.categories = {}
+
+  widget.addListItem("sipItemScroll.sipItemList")
 end
 
 function sip.update(dt)
@@ -21,5 +23,13 @@ function sip.categorySelected()
 end
 
 function sip.search()
+
+end
+
+function sip.changePage(_, data)
+
+end
+
+function sip.print()
 
 end
