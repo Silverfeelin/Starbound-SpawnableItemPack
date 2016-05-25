@@ -33,3 +33,15 @@ end
 function sip.print()
 
 end
+
+function sip.changeCategory()
+
+end
+
+function sip.changeType()
+
+end
+
+function sip.changeQuantity()
+
+end
