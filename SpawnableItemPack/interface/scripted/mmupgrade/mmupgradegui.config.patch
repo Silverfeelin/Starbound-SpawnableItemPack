@@ -542,6 +542,50 @@
   },
   {
     "op": "add",
+    "path": "/gui/sipCategoryBackground",
+    "value": {
+      "type": "image",
+      "file": "/interface/sip/categorybackground.png",
+      "position": [
+        174,
+        58
+      ],
+      "zlevel": 25,
+      "visible": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipCategoryScroll",
+    "value": {
+      "type": "scrollArea",
+      "zlevel": 26,
+      "visible": true,
+      "rect": [
+        177,
+        61,
+        335,
+        182
+      ],
+      "children": {
+        "sipLabelCatVanity": {
+        "type": "label",
+        "position": [
+          0,
+          0
+        ],
+        "hAnchor": "left",
+        "vAnchor": "top",
+        "zlevel": 21,
+        "wrapWidth" : 127,
+        "value": "^white;^shadow;Vanity:",
+        "visible": true
+      }
+      }
+    }
+  },
+  {
+    "op": "add",
     "path": "/packages/-",
     "value": {
       "activator": "btnSIP",
