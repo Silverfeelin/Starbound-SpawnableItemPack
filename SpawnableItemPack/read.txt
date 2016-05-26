@@ -1,5 +1,77 @@
-btnSIP Activator
-sipItemScroll
- sipItemList
-  background, itemName, itemIcon, rarityIcon
-sipLabelSelectItem
+.activeitem inventoryIcon
+category (case insens?): uniqueWeapon(gun/melee) broadsword tool shield throwableItem
+mysteriousReward toy vehicleController sniperRifle boomerang railPlatform bow
+fistWeapon chakram axe dagger hammer spear shortsword shotgun assaultRifle machinePistol
+rocketLauncher pistol grenadeLauncher staff wand whip
+
+.object inventoryIcon
+category (case insens?): decorative actionFigure trap storage door other light furniture
+wire breakable crafting bug seed teleportMarker generic spawner artifact sapling railPoint
+
+.codex icon
+
+.head .chest .legs .back
+category: headwear, chestwear, legwear, backwear
+category: headarmour, chestarmour, legarmour
+category: enviroProtectionPack (back)
+
+.augment
+eppAugment petCollar clothingDye
+
+.coinitem
+Has no category!
+
+.item
+mediumFossil largeFossil smallFossil craftingMaterial shipLicense cookingIngredient upgradeComponent
+quest junk currency trophy tradingCard
+
+.consumable
+preparedFood drink food medicine
+
+.unlock
+Other
+Upgrade Component
+
+.instrument
+musicalInstrument
+
+.liqitem
+liquid
+
+.matitem
+block platform
+
+.thrownitem
+throwableItem
+
+.harvestingtool
+Tool
+
+.flashlight
+Tool
+
+.grapplinghook
+Tool
+
+.painttool
+Tool ^green;[Y]
+
+.wiretool
+Tool ^green;[T]
+
+.beamaxe
+Tool ^green;[R]
+
+.tillingtool
+Tool
+
+.miningtool
+Tool
+
+.techitem
+No category!
+
+.material
+materials supports Supports
+
+.vehicle
