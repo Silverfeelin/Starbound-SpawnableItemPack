@@ -309,7 +309,7 @@
       "wrapWidth": 80,
       "hAnchor": "mid",
       "zlevel": 20,
-      "data": -1,
+      "data": 1,
       "visible": true,
       "pressedOffset": [
         0,
@@ -337,7 +337,7 @@
       "zlevel": 21,
       "maxWidth": 75,
       "regex": "x?\\d{0,4}",
-      "callback": "null"
+      "callback": "sip.changeQuantity"
     }
   },
   {
@@ -551,7 +551,7 @@
         58
       ],
       "zlevel": 25,
-      "visible": true
+      "visible": false
     }
   },
   {
@@ -560,7 +560,7 @@
     "value": {
       "type": "scrollArea",
       "zlevel": 26,
-      "visible": true,
+      "visible": false,
       "rect": [
         177,
         61,
