@@ -81,17 +81,50 @@
                   5
                 ],
                 "hAnchor": "left",
-                "wrapWidth": 116,
+                "zlevel": 2,
                 "value": "Replace Me"
               },
               "itemIcon": {
                 "type": "image",
                 "file": "/assetMissing.png",
                 "position": [
-                  0,
-                  1
+                  11,
+                  9
                 ],
                 "zlevel": 0,
+                "visible": true,
+                "centered": true
+              },
+              "itemIcon2": {
+                "type": "image",
+                "file": "/assetMissing.png",
+                "position": [
+                  11,
+                  9
+                ],
+                "zlevel": 0,
+                "visible": true,
+                "centered": true
+              },
+              "itemIcon3": {
+                "type": "image",
+                "file": "/assetMissing.png",
+                "position": [
+                  11,
+                  9
+                ],
+                "zlevel": 0,
+                "visible": true,
+                "centered": true
+              },
+              "itemOverlay": {
+                "type": "image",
+                "file": "/interface/sip/itemoverlay.png",
+                "position": [
+                  1,
+                  0
+                ],
+                "zlevel": 1,
                 "visible": true
               },
               "rarityIcon": {
@@ -309,7 +342,7 @@
       "wrapWidth": 80,
       "hAnchor": "mid",
       "zlevel": 20,
-      "data": -1,
+      "data": 1,
       "visible": true,
       "pressedOffset": [
         0,
@@ -337,7 +370,7 @@
       "zlevel": 21,
       "maxWidth": 75,
       "regex": "x?\\d{0,4}",
-      "callback": "null"
+      "callback": "sip.changeQuantity"
     }
   },
   {
@@ -542,6 +575,117 @@
   },
   {
     "op": "add",
+    "path": "/gui/sipCategoryBackground",
+    "value": {
+      "type": "image",
+      "file": "/interface/sip/categorybackground.png",
+      "position": [
+        174,
+        58
+      ],
+      "zlevel": 25,
+      "visible": false
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipCategoryScroll",
+    "value": {
+      "type": "scrollArea",
+      "zlevel": 26,
+      "visible": false,
+      "rect": [
+        177,
+        61,
+        335,
+        182
+      ],
+      "children": {
+        "sipCatoryAnchor": {
+          "type": "image",
+          "position": [
+            0,
+            0
+          ],
+          "file": "/assetMissing.png?crop;0;0;0;0",
+          "visible": true
+        },
+        "sipCategoryGroup" : {
+          "type" : "radioGroup",
+          "toggleMode" : true,
+          "callback": "sip.selectCategory",
+          "buttons" : [
+            {
+              "baseImage" : "/interface/sip/categories/all.png",
+              "hoverImage" : "/interface/sip/categories/all.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/armor.png",
+              "hoverImageChecked" : "/interface/sip/categories/armor.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -27],
+              "data" : "headwear"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/all.png",
+              "hoverImage" : "/interface/sip/categories/all.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/armor.png",
+              "hoverImageChecked" : "/interface/sip/categories/armor.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [20, -27],
+              "data" : "chestwear"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/all.png",
+              "hoverImage" : "/interface/sip/categories/all.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/armor.png",
+              "hoverImageChecked" : "/interface/sip/categories/armor.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [39, -27],
+              "caption": "test",
+              "data" : "legwear"
+            }
+          ]
+        },
+        "sipLabelCatVanity": {
+          "type": "label",
+          "position": [
+            1,
+            0
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Vanity:",
+          "visible": true
+        },
+        "sipLabelCatArmor": {
+          "type": "label",
+          "position": [
+            1,
+            -29
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Armor:",
+          "visible": true
+        },
+        "sipLabelCatWeapons": {
+          "type": "label",
+          "position": [
+            1,
+            -250
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Weapons:",
+          "visible": true
+        }
+      }
+    }
+  },
+  {
+    "op": "add",
     "path": "/packages/-",
     "value": {
       "activator": "btnSIP",
@@ -616,5 +760,10 @@
     "op": "add",
     "path": "/scriptWidgetCallbacks/-",
     "value": "sip.changeQuantity"
+  },
+  {
+    "op": "add",
+    "path": "/scriptWidgetCallbacks/-",
+    "value": "sip.selectCategory"
   }
 ]
