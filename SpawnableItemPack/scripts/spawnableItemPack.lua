@@ -171,6 +171,7 @@ end
 function sip.setQuantity(amnt)
   if type(amnt) ~= "number" then error("SIP: Attempted to set quantity to an invalid number. Please contact the mod author.") end
   sip.quantity = math.clamp(amnt, 0, 9999)
+
   widget.setText("sipTextQuantity", "x" .. sip.getQuantity())
 end
 
