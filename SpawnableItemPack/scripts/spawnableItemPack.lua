@@ -12,10 +12,15 @@ function sip.init()
   mui.setTitle("^shadow;Spawnable Item Pack", "^shadow;Spawn anything, for free!")
   mui.setIcon("/interface/sip/icon.png")
   
+  sip.searchDelay, sip.searchTick = 15, 15
+  sip.searched = true
+  sip.previousSearch = ""
+  
   sip.items = root.assetJson("/sipItemDump.json")
   sip.itemList =  "sipItemScroll.sipItemList"
-  sip.categories = {}
+  sip.categories = nil
   sip.changingCategory = false
+  
   sip.selectedCategory = nil
   -- TODO: Clear current category selection in radioGroup.
   
@@ -41,36 +46,35 @@ function sip.logENV()
   end
 end
 
-function sip.showItems(category)
+function sip.showItems(category) 
   widget.clearListItems("sipItemScroll.sipItemList")
   
-  local categories = {}
-  
-  if type(category) == "string" then categories[category] = true end
-  if type(category) == "table" then
-    categories = Set(category)
+  if category then
+    sip.categories = nil
+    if type(category) == "string" then sip.categories = { [category] = true }
+    elseif type(category) == "table" then sip.categories = Set(category) end
   end
-  
-  sb.logInfo("%s", categories)
   
   local count = 0
   
   for i,v in ipairs(sip.items) do
-    if category == nil or categories[v.category:lower()] then
-      local li = widget.addListItem("sipItemScroll.sipItemList")
-      widget.setText(sip.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
-      widget.setData(sip.itemList .. "." .. li, v)
-      widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemRarity", sip.rarities[v.rarity])
-      if type(v.icon) == "string" and v.icon ~= "null" then
-        if v.icon:find("/") == 1 then v.path = "" end
-        local path = v.path .. v.icon
-        widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path)
-      elseif type(v.icon) == "table" then
-        sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.icon[1])
-        sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.icon[2])
-        sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.icon[3])
+    if not sip.categories or sip.categories[v.category:lower()] then
+      if sip.previousSearch == "" or v.shortdescription:lower():find(sip.previousSearch:lower()) or v.name:lower():find(sip.previousSearch:lower()) then
+        local li = widget.addListItem("sipItemScroll.sipItemList")
+        widget.setText(sip.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
+        widget.setData(sip.itemList .. "." .. li, v)
+        widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemRarity", sip.rarities[v.rarity])
+        if type(v.icon) == "string" and v.icon ~= "null" then
+          if v.icon:find("/") == 1 then v.path = "" end
+          local path = v.path .. v.icon
+          widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path)
+        elseif type(v.icon) == "table" then
+          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.icon[1])
+          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.icon[2])
+          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.icon[3])
+        end
+        count = count + 1
       end
-      count = count + 1
     end
   end
   
@@ -85,7 +89,14 @@ function sip.setDrawableIcon(wid, path, drawable)
 end
 
 function sip.update(dt)
-
+  if not sip.searched then
+    sip.searchTick = sip.searchTick - 1
+    if sip.searchTick <= 0 then
+      sip.searched = true
+      sip.searchTick = sip.searchDelay
+      sip.filter()
+    end
+  end
 end
 
 function sip.uninit()
@@ -93,7 +104,17 @@ function sip.uninit()
 end
 
 function sip.search()
--- TODO
+  sip.searchTick = sip.searchDelay
+  sip.searched = false
+end
+
+function sip.filter()
+  local filter = widget.getText("sipTextSearch")
+  if filter == sip.previousSearch then return end
+  
+  sip.previousSearch = filter
+  
+  sip.showItems()
 end
 
 function sip.changePage(_, data)
@@ -143,6 +164,7 @@ function sip.selectCategory(w, category)
     sip.showItems(category)
   else
     sip.selectedCategory = nil
+    sip.categories = nil
     sip.showItems()
   end
 end
