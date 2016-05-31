@@ -1,6 +1,13 @@
 spawnableItemPack = {}
 sip = spawnableItemPack
 
+sip.rarities = {
+  common = "/interface/inventory/grayborder.png",
+  uncommon = "/interface/inventory/greenborder.png",
+  rare = "/interface/inventory/blueborder.png",
+  legendary = "/interface/inventory/purpleborder.png"
+}
+
 function sip.init()
   mui.setTitle("^shadow;Spawnable Item Pack", "^shadow;Spawn anything, for free!")
   mui.setIcon("/interface/sip/icon.png")
@@ -10,6 +17,7 @@ function sip.init()
   sip.categories = {}
   sip.changingCategory = false
   sip.selectedCategory = nil
+  -- TODO: Clear current category selection in radioGroup.
   
   sip.logENV()
   
@@ -52,9 +60,11 @@ function sip.showItems(category)
       local li = widget.addListItem("sipItemScroll.sipItemList")
       widget.setText(sip.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
       widget.setData(sip.itemList .. "." .. li, v)
+      widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemRarity", sip.rarities[v.rarity])
       if type(v.icon) == "string" and v.icon ~= "null" then
         if v.icon:find("/") == 1 then v.path = "" end
-        widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.path .. v.icon)
+        local path = v.path .. v.icon
+        widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path)
       elseif type(v.icon) == "table" then
         sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.icon[1])
         sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.icon[2])
@@ -82,16 +92,12 @@ function sip.uninit()
   sip.showCategories(false)
 end
 
-function sip.categorySelected()
-  
-end
-
 function sip.search()
-
+-- TODO
 end
 
 function sip.changePage(_, data)
-
+-- TODO, or remove pages. Performance seems decent enough.
 end
 
 function sip.print()
@@ -107,9 +113,7 @@ function sip.print()
     player.giveItem({name=item.name, count=1000})
   end
   player.giveItem({name=item.name, count=rest})
-
-    
-
+  
 end
 
 function sip.getSelectedItem()
@@ -132,9 +136,6 @@ function sip.showCategories(bool)
   widget.setVisible("sipCategoryScroll", bool)
 end
 
-function sip.changeType()
-
-end
 
 function sip.selectCategory(w, category)
   if sip.selectedCategory ~= w then

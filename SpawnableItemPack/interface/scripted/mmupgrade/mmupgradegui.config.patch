@@ -84,6 +84,18 @@
                 "zlevel": 2,
                 "value": "Replace Me"
               },
+              "itemRarity": {
+                "type": "image",
+                "file": "/assetMissing.png",
+                "position": [
+                  11,
+                  9
+                ],
+                "zlevel": 1,
+                "maxSize": [18,18],
+                "visible": true,
+                "centered": true
+              },
               "itemIcon": {
                 "type": "image",
                 "file": "/assetMissing.png",
@@ -91,7 +103,8 @@
                   11,
                   9
                 ],
-                "zlevel": 0,
+                "zlevel": 1,
+                "maxSize": [18,18],
                 "visible": true,
                 "centered": true
               },
@@ -102,7 +115,7 @@
                   11,
                   9
                 ],
-                "zlevel": 0,
+                "zlevel": 1,
                 "visible": true,
                 "centered": true
               },
@@ -113,7 +126,7 @@
                   11,
                   9
                 ],
-                "zlevel": 0,
+                "zlevel": 1,
                 "visible": true,
                 "centered": true
               },
@@ -217,7 +230,7 @@
       "hAnchor": "mid",
       "vAnchor": "bottom",
       "zlevel": 21,
-      "value": "^white;^shadow;1/n"
+      "value": "^white;^shadow;1/1"
     }
   },
   {
@@ -614,34 +627,98 @@
           "type" : "radioGroup",
           "toggleMode" : true,
           "callback": "sip.selectCategory",
+          "position": [0,0],
+          "zlevel": 22,
           "buttons" : [
             {
-              "baseImage" : "/interface/sip/categories/all.png",
-              "hoverImage" : "/interface/sip/categories/all.png?brightness=30",
-              "baseImageChecked" : "/interface/sip/categories/armor.png",
-              "hoverImageChecked" : "/interface/sip/categories/armor.png?brightness=30",
+              "baseImage" : "/interface/sip/categories/vanityhat.png",
+              "hoverImage" : "/interface/sip/categories/vanityhat.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/vanityhatselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/vanityhatselected.png?brightness=30",
               "pressedOffset" : [0, -1],
-              "position" : [1, -27],
+              "position" : [1, -33],
               "data" : "headwear"
             },
             {
-              "baseImage" : "/interface/sip/categories/all.png",
-              "hoverImage" : "/interface/sip/categories/all.png?brightness=30",
-              "baseImageChecked" : "/interface/sip/categories/armor.png",
-              "hoverImageChecked" : "/interface/sip/categories/armor.png?brightness=30",
+              "baseImage" : "/interface/sip/categories/vanitychest.png",
+              "hoverImage" : "/interface/sip/categories/vanitychest.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/vanitychestselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/vanitychestselected.png?brightness=30",
               "pressedOffset" : [0, -1],
-              "position" : [20, -27],
+              "position" : [38, -33],
               "data" : "chestwear"
             },
             {
-              "baseImage" : "/interface/sip/categories/all.png",
-              "hoverImage" : "/interface/sip/categories/all.png?brightness=30",
-              "baseImageChecked" : "/interface/sip/categories/armor.png",
-              "hoverImageChecked" : "/interface/sip/categories/armor.png?brightness=30",
+              "baseImage" : "/interface/sip/categories/vanitypants.png",
+              "hoverImage" : "/interface/sip/categories/vanitypants.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/vanitypantsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/vanitypantsselected.png?brightness=30",
               "pressedOffset" : [0, -1],
-              "position" : [39, -27],
-              "caption": "test",
+              "position" : [75, -33],
               "data" : "legwear"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/vanityback.png",
+              "hoverImage" : "/interface/sip/categories/vanityback.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/vanitybackselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/vanitybackselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [112, -33],
+              "data" : "backwear"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/armorhelm.png",
+              "hoverImage" : "/interface/sip/categories/armorhelm.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/armorhelmselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/armorhelmselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -66],
+              "data" : "headarmour"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/armorchest.png",
+              "hoverImage" : "/interface/sip/categories/armorchest.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/armorchestselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/armorchestselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [38, -66],
+              "data" : "chestarmour"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/armorpants.png",
+              "hoverImage" : "/interface/sip/categories/armorpants.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/armorpantsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/armorpantsselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [75, -66],
+              "data" : "legarmour"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/envirormental.png",
+              "hoverImage" : "/interface/sip/categories/envirormental.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/envirormentalselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/envirormentalselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [112, -66],
+              "data" : "enviroprotectionpack"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/weapons.png",
+              "hoverImage" : "/interface/sip/categories/weapons.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/weaponsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/weaponsselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -99],
+              "data" : ["melee", "broadsword", "fistweapon", "chakram", "axe", "dagger", "hammer", "spear", "shortsword", "whip"]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/gun.png",
+              "hoverImage" : "/interface/sip/categories/gun.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/gunselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/gunselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [38, -99],
+              "data" : ["ranged", "sniperrifle", "boomerang", "bow", "shotgun", "assaultrifle", "machinepistol", "rocketlauncher", "pistol", "grenadelauncher", "staff", "wand"]
             }
           ]
         },
@@ -661,7 +738,7 @@
           "type": "label",
           "position": [
             1,
-            -29
+            -34
           ],
           "hAnchor": "left",
           "vAnchor": "top",
@@ -673,7 +750,7 @@
           "type": "label",
           "position": [
             1,
-            -250
+            -67
           ],
           "hAnchor": "left",
           "vAnchor": "top",
