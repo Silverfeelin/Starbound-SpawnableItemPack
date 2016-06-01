@@ -1,6 +1,21 @@
+Notes:
+
+Set .coinitem category to currency
+
+New category icons:
+crafting objects & npc spawner objects
+
+New inventory icons (themed for 'randomness'):
+axe, broadsword, dagger, hammer, shortsword, spear 
+assaultrifle, machinepistol, pistol, rocketlauncher, shotgun, sniperrifle, staff, wand
+
+=============
+== CATEGORIES
+
 Vanity:
 headwear, chestwear, legwear, backwear
 ===
+
 Armor:
 headarmour, chestarmour, legarmour, enviroProtectionPack
 ===

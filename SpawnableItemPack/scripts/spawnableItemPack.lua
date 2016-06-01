@@ -46,8 +46,14 @@ function sip.init()
   sip.showItems()
 end
 
+--[[
+  Populates the item list with items for the given category, the previous categories or all categories.
+  Filters the list based on text input. Text filtering compares item shortdescription and item name with the input case-insensitive.
+  @param [category] - String representing a category or table with strings representing a set of categories. Items matching one category will be listed.
+    With no argument supplied, uses the sip.categories value instead. If sip.categories is nil, displays all items filtered by text.
+]]
 function sip.showItems(category) 
-  widget.clearListItems("sipItemScroll.sipItemList")
+  widget.clearListItems(sip.widgets.itemList)
   
   if category then
     sip.categories = nil
@@ -60,7 +66,7 @@ function sip.showItems(category)
   for i,v in ipairs(sip.items) do
     if not sip.categories or sip.categories[v.category:lower()] then
       if sip.previousSearch == "" or v.shortdescription:lower():find(sip.previousSearch:lower()) or v.name:lower():find(sip.previousSearch:lower()) then
-        local li = widget.addListItem("sipItemScroll.sipItemList")
+        local li = widget.addListItem(sip.widgets.itemList)
         widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
         widget.setData(sip.widgets.itemList .. "." .. li, v)
         widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemRarity", sip.rarities[v.rarity])
@@ -69,9 +75,9 @@ function sip.showItems(category)
           local path = v.path .. v.icon
           widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path)
         elseif type(v.icon) == "table" then
-          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.icon[1])
-          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.icon[2])
-          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.icon[3])
+          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.path, v.icon[1])
+          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.path, v.icon[2])
+          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.path, v.icon[3])
         end
         count = count + 1
       end
@@ -81,10 +87,17 @@ function sip.showItems(category)
   sb.logInfo("SIP: Done adding " .. count .. " items to the list!")
 end
 
+--[[
+  Sets a classic drawable formatted image on the given widget.
+  @param wid - Image widget to apply the drawable to.
+  @param path - Item path.
+  @param drawable - Single drawable object. Only the image parameter is used.
+]]
 function sip.setDrawableIcon(wid, path, drawable)
-  if not d or not d.image then return end
-  local image = d.image
-  if drawable:find("/") == 1 then path = "" end
+  sb.logInfo("%s - %s - %s", wid, path, drawable)
+  if not drawable or not drawable.image then return end
+  local image = drawable.image
+  if image:find("/") == 1 then path = "" end
   widget.setImage(wid, path .. image)
 end
 
@@ -245,6 +258,19 @@ function sip.print()
   end
   
   sip.spawnItem(item.name, q)
+end
+
+--[[
+  Widget callback function. Shows all item of the given type.
+  @param _ - Widget name
+  @param t - Widget data representing the type to show. Should be items or objects
+]]
+function sip.showType(_, t)
+  local cats = {
+    objects = { "materials", "liqitem", "supports", "railpoint", "decorative", "actionfigure", "artifact", "breakable", "bug", "crafting", "spawner", "door", "light", "storage", "furniture", "trap", "wire", "sapling", "seed", "other", "generic", "teleportmarker" },
+    items = { "headwear", "chestwear", "legwear", "backwear", "headarmour", "chestarmour", "legarmour", "enviroprotectionpack", "broadsword", "fistweapon", "chakram", "axe", "dagger", "hammer", "spear", "shortsword", "whip", "melee", "ranged", "sniperrifle", "boomerang", "bow", "shotgun", "assaultrifle", "machinepistol", "rocketlauncher", "pistol", "grenadelauncher", "staff", "wand", "throwableitem", "shield", "vehiclecontroller", "railplatform", "upgrade", "shiplicense", "mysteriousreward", "toy", "clothingdye", "medicine", "drink", "food", "preparedfood", "craftingmaterial", "cookingingredient", "upgradecomponent", "smallfossil", "mediumfossil", "largefossil", "codex", "quest", "junk", "currency", "trophy", "tradingcard", "eppaugment", "petcollar", "musicalinstrument", "tool" }
+  }
+  sip.showItems(cats[t])
 end
 
 function sip.changePage(_, data)

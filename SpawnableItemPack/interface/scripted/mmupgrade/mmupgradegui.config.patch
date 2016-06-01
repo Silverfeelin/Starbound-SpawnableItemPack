@@ -461,7 +461,7 @@
         185
       ],
       "data": "items",
-      "callback": "sip.changeType"
+      "callback": "sip.showType"
     }
   },
   {
@@ -485,7 +485,7 @@
         185
       ],
       "data": "objects",
-      "callback": "sip.changeType"
+      "callback": "sip.showType"
     }
   },
   {
@@ -816,7 +816,7 @@
   {
     "op": "add",
     "path": "/scriptWidgetCallbacks/-",
-    "value": "sip.changeType"
+    "value": "sip.showType"
   },
   {
     "op": "add",
