@@ -361,6 +361,7 @@ end
 ]]
 function sip.settingsOpened()
   widget.setImage("bgb", "/resources/blankbody.png")
+  sip.showCategories(false)
 end
 
 --[[
@@ -369,6 +370,7 @@ end
 ]]
 function sip.settingsClosed()
   widget.setImage("bgb", "/interface/sip/body.png")
+  sip.showCategories(sip.changingCategory)
 end
 
 ----------------------
