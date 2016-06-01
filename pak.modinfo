@@ -1,0 +1,7 @@
+{
+  "name" : "SpawnableItemPack",
+  "path" : ".",
+  "requires" : [
+    "Manipulated UI"
+  ]
+}
