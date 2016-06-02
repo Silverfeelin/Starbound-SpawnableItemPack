@@ -19,8 +19,14 @@ sip.widgets = {
   itemList = "sipItemScroll.sipItemList",
   search = "sipTextSearch",
   categoryBackground = "sipCategoryBackground",
-  categoryScrollArea = "sipCategoryScroll"
+  categoryScrollArea = "sipCategoryScroll",
+  itemDescription = "sipLabelSelectionDescription",
+  itemImage = "sipImageSelection",
+  itemImage2 = "sipImageSelection2",
+  itemImage3 = "sipImageSelection3"
 }
+
+sip.descriptionMissing = "No description could be found for this item."
 
 --------------------------
 -- Engine/MUI Callbacks --
@@ -41,26 +47,26 @@ function sip.init()
   sip.items = root.assetJson("/sipItemDump.json")
   sip.categories = nil
   sip.changingCategory = false
-  
-  sip.selectedCategory = nil
-  
-  -- TODO: Clear current category selection in radioGroup.
-  -- Current callbacks do not appear to allow this.
-  
-  --logENV()
-  
+  sip.showCategories(false)
   sip.quantity = 1
   
-  sip.showCategories(false)
+  -- Synchronize UI with script by checking the dimensions of an invisible widget.
+  local category, categoryData = sip.getSelectedCategory()
+  if category then
+    widget.setSize("sipCategoryIndex", {0,0})
+    sip.selectCategory(category, categoryData)
+  else
+    sip.showItems()
+  end
   
-  sip.showItems()
+  --logENV()
 end
 
 --[[
   Update function, called every game tick by MUI while the interface is opened.
   @param dt - Delay between this and the previous update tick.
 ]]
-function sip.update(dt)
+function sip.update(dt) 
   if not sip.searched then
     sip.searchTick = sip.searchTick - 1
     if sip.searchTick <= 0 then
@@ -169,7 +175,7 @@ end
   @param drawable - Single drawable object. Only the image parameter is used.
 ]]
 function sip.setDrawableIcon(wid, path, drawable)
-  if not drawable or not drawable.image then return end
+  if not drawable or not drawable.image then drawable = { image = "/assetMissing.png" } end
   local image = drawable.image
   if image:find("/") == 1 then path = "" end
   widget.setImage(wid, path .. image)
@@ -223,6 +229,23 @@ function sip.showCategories(bool)
 end
 
 --[[
+  Returns the currently selected category widget and data, or nil, by checking the
+  dimensions of an invisible image widget that's used to keep track of the selection.
+  This is necessary due to the currently/previously broken widget.getSelectedOption callback.
+  Size[1] > Selected (1 = true, not 1 = false), defaults at image width which is 64.
+    Unless this value is 1, we're selecting a category, and the selection can be ignored.
+  Size[2] > Selection
+    Matches the widget name / index of the selected radioGroup button. Only matters if Selected is true.
+  @return - The widget name / index of the selected category button, or nil if no category is selected.
+  @return - The widget data of the selected category button, or nil if no category is selected.
+  ]]
+function sip.getSelectedCategory()
+  local index = widget.getSize("sipCategoryIndex")
+  if index[1] ~= 1 then return nil end
+  return index[2], widget.getData("sipCategoryScroll.sipCategoryGroup." .. index[2])
+end
+
+--[[
   Returns the currently selected quantity of items to print. Errors if quantity somehow ends up not being a number.
   @return - Quantity of item to print.
 ]]
@@ -250,6 +273,25 @@ end
 function sip.adjustQuantity(amnt)
   if type(amnt) ~= "number" then error("SIP: Attempted to adjust quantity by an invalid number. Please contact the mod author.") end
   sip.setQuantity(sip.getQuantity() + amnt)
+end
+
+--[[
+  Returns the game's item configuration for the given item, handling errors when an invalid item is given.
+  Note that details are generally stored in returnValue.config. The parameter returnValue.parameters
+  may also contain useful data.
+  @param itemName - Item identifier used to spawn the item with (usually itemName or objectName).
+  @return - Item configuration as root.itemConfig returns it, or nil if the item configuration could not be found.
+]]
+function sip.getItemConfig(itemName)
+  local cfg
+  if pcall(function()
+    cfg = root.itemConfig(itemName)
+  end) then
+    return cfg
+  else
+    sb.logError("SIP: Item configuration could not be loaded! Please report the following line to the mod author.\n%s", item)
+    return nil
+  end
 end
 
 ----------------------
@@ -280,13 +322,49 @@ end
   @param category - Widget data, structured "category" or ["category", "category2"].
 ]]
 function sip.selectCategory(w, category)
-  if sip.selectedCategory ~= w then
-    sip.selectedCategory = w
+  local index = widget.getSize("sipCategoryIndex")
+  local selecting = index[1] == 0
+  local selected = index[2]
+  local newSelection = tonumber(w)
+  
+  if selecting or newSelection ~= selected then
+    widget.setSize("sipCategoryIndex", {1, newSelection})
     sip.showItems(category)
   else
-    sip.selectedCategory = nil
+    widget.setSize("sipCategoryIndex", {0, -1})
     sip.categories = nil
     sip.showItems()
+  end
+end
+
+--[[
+  Widget callback function. Used to display item information on the currently selected item.
+]]
+function sip.itemSelected()
+  local item = sip.getSelectedItem()
+  local config
+  if item then config = sip.getItemConfig(item.name) else return end
+  -- Config is a parameter of the returned item config.. for reasons.
+  config = config and config.config or {}
+    
+  widget.setText(sip.widgets.itemDescription, config.description or sip.descriptionMissing)
+  
+  if type(item.icon) == "string" and item.icon ~= "null" then
+    if item.icon:find("/") == 1 then item.path = "" end
+    local path = item.path .. item.icon
+    widget.setImage("sipImageSelection", path)
+    widget.setImage("sipImageSelection2", "/assetMissing.png")
+    widget.setImage("sipImageSelection3", "/assetMissing.png")
+    widget.setImage("sipImageSelectionIcon", path)
+    widget.setImage("sipImageSelectionIcon2", "/assetMissing.png")
+    widget.setImage("sipImageSelectionIcon3", "/assetMissing.png")
+  elseif type(item.icon) == "table" then
+    sip.setDrawableIcon("sipImageSelection", item.path, item.icon[1])
+    sip.setDrawableIcon("sipImageSelection2", item.path, item.icon[2])
+    sip.setDrawableIcon("sipImageSelection3", item.path, item.icon[3])
+    sip.setDrawableIcon("sipImageSelectionIcon", item.path, item.icon[1])
+    sip.setDrawableIcon("sipImageSelectionIcon2", item.path, item.icon[2])
+    sip.setDrawableIcon("sipImageSelectionIcon3", item.path, item.icon[3])
   end
 end
 
@@ -314,14 +392,8 @@ function sip.print()
   local item, q = sip.getSelectedItem(), sip.getQuantity()
   if not item or not item.name then return end
   
-  if not pcall(function()
-    local cfg = root.itemConfig(item.name)
-    if cfg.config and cfg.config.maxStack == 1 then
-      q = 1
-    end
-  end) then
-    sb.logError("SIP: Item configuration could not be loaded! Please report the following line to the mod author.\n%s", item)
-  end
+  local cfg = sip.getItemConfig(item.name)
+  if cfg and cfg.config.maxStack == 1 then q = 1 end
   
   sip.spawnItem(item.name, q)
 end
@@ -341,6 +413,13 @@ function sip.showType(_, t)
   sip.showItems(cats[t])
 end
 
+--[[
+  NOT IMPLEMENTED
+  Widget callback function. Used to scroll between item pages when there's a set limit on the amount
+  of items displayed per page, and the amount of items to be listed exceeds this number.
+  @param _ - Widget name; not used.
+  @param data - Widget data. -2 = First page. -1 = Previous page. 1 = Next page. 2 = Last page.
+]]
 function sip.changePage(_, data)
   -- TODO: Remove or implement pages and displaying of items per page. Performance seems decent enough not to require pages.
   -- Could be used at some point when the game or mods add so many items that performance destabilizes.

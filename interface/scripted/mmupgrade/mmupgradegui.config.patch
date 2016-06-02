@@ -53,6 +53,7 @@
       "children": {
         "sipItemList": {
           "type": "list",
+          "callback": "sip.itemSelected",
           "schema": {
             "selectedBG": "/interface/sip/itemselected.png",
             "unselectedBG": "/interface/sip/itembackground.png",
@@ -105,6 +106,7 @@
                 ],
                 "zlevel": 1,
                 "maxSize": [18,18],
+                "minSize": [18,18],
                 "visible": true,
                 "centered": true
               },
@@ -116,6 +118,8 @@
                   9
                 ],
                 "zlevel": 1,
+                "maxSize": [18,18],
+                "minSize": [18,18],
                 "visible": true,
                 "centered": true
               },
@@ -127,6 +131,8 @@
                   9
                 ],
                 "zlevel": 1,
+                "maxSize": [18,18],
+                "minSize": [18,18],
                 "visible": true,
                 "centered": true
               },
@@ -509,11 +515,48 @@
       "type": "image",
       "file": "/assetMissing.png",
       "position": [
-        310,
-        159
+        321,
+        170
       ],
-      "zlevel": 20,
-      "visible": true
+      "maxSize": [18,18],
+      "minSize": [18,18],
+      "zlevel": 21,
+      "visible": true,
+      "centered": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipImageSelectionIcon2",
+    "value": {
+      "type": "image",
+      "file": "/assetMissing.png",
+      "position": [
+        321,
+        170
+      ],
+      "maxSize": [18,18],
+      "minSize": [18,18],
+      "zlevel": 21,
+      "visible": true,
+      "centered": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipImageSelectionIcon3",
+    "value": {
+      "type": "image",
+      "file": "/assetMissing.png",
+      "position": [
+        321,
+        170
+      ],
+      "maxSize": [18,18],
+      "minSize": [18,18],
+      "zlevel": 21,
+      "visible": true,
+      "centered": true
     }
   },
   {
@@ -521,20 +564,66 @@
     "path": "/gui/sipImageSelection",
     "value": {
       "type": "image",
-      "file": "/assetMissing.png?replace;ffffff00=ffffffff",
+      "file": "/assetMissing.png",
       "position": [
         254,
-        84
+        95
       ],
-      "zlevel": 20,
+      "zlevel": 21,
       "centered": true,
       "maxSize": [
-        30,
-        30
+        151,
+        64
       ],
       "minSize": [
-        20,
-        20
+        151,
+        64
+      ],
+      "visible": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipImageSelection2",
+    "value": {
+      "type": "image",
+      "file": "/assetMissing.png",
+      "position": [
+        254,
+        95
+      ],
+      "zlevel": 21,
+      "centered": true,
+      "maxSize": [
+        151,
+        64
+      ],
+      "minSize": [
+        151,
+        64
+      ],
+      "visible": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipImageSelection3",
+    "value": {
+      "type": "image",
+      "file": "/assetMissing.png",
+      "position": [
+        254,
+        95
+      ],
+      "zlevel": 21,
+      "centered": true,
+      "maxSize": [
+        151,
+        64
+      ],
+      "minSize": [
+        151,
+        64
       ],
       "visible": true
     }
@@ -549,7 +638,7 @@
         315,
         149
       ],
-      "zlevel": 21,
+      "zlevel": 20,
       "visible": true
     }
   },
@@ -564,7 +653,7 @@
       ],
       "hAnchor": "mid",
       "vAnchor": "bottom",
-      "zlevel": 21,
+      "zlevel": 22,
       "value": "^white;^shadow;Selected Item",
       "visible": true
     }
@@ -580,7 +669,7 @@
       ],
       "hAnchor": "left",
       "vAnchor": "top",
-      "zlevel": 21,
+      "zlevel": 22,
       "wrapWidth" : 127,
       "value": "^white;Selected Item Description.",
       "visible": true
@@ -597,6 +686,20 @@
         58
       ],
       "zlevel": 25,
+      "visible": false
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipCategoryIndex",
+    "value": {
+      "type": "image",
+      "file": "/assetMissing.png",
+      "position": [
+        0,
+        0
+      ],
+      "zlevel": -1,
       "visible": false
     }
   },
@@ -787,7 +890,11 @@
         "sipTextQuantity",
         "sipImageSelectionIconBackground",
         "sipImageSelection",
+        "sipImageSelection2",
+        "sipImageSelection3",
         "sipImageSelectionIcon",
+        "sipImageSelectionIcon2",
+        "sipImageSelectionIcon3",
         "sipImageSelectionRarity",
         "sipLabelSelectionName",
         "sipLabelSelectionDescription"
@@ -822,6 +929,11 @@
     "op": "add",
     "path": "/scriptWidgetCallbacks/-",
     "value": "sip.categorySelected"
+  },
+  {
+    "op": "add",
+    "path": "/scriptWidgetCallbacks/-",
+    "value": "sip.itemSelected"
   },
   {
     "op": "add",
