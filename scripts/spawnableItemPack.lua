@@ -92,36 +92,30 @@ end
 function sip.showItems(category) 
   widget.clearListItems(sip.widgets.itemList)
   
-  if category then
-    sip.categories = nil
-    if type(category) == "string" then sip.categories = { [category] = true }
-    elseif type(category) == "table" then sip.categories = Set(category) end
-  end
+  if type(category) == "nil" then sip.categories = nil
+  elseif type(category) ~= "table" and type(category) ~= "string" then error("SIP: Attempted to search for invalid category")
+  else sip.categories = category end
   
-  local count = 0
-  
-  for i,v in ipairs(sip.items) do
-    if not sip.categories or sip.categories[v.category:lower()] then
-      if sip.previousSearch == "" or v.shortdescription:lower():find(sip.previousSearch:lower()) or v.name:lower():find(sip.previousSearch:lower()) then
-        local li = widget.addListItem(sip.widgets.itemList)
-        widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
-        widget.setData(sip.widgets.itemList .. "." .. li, v)
-        widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemRarity", sip.rarities[v.rarity])
-        if type(v.icon) == "string" and v.icon ~= "null" then
-          if v.icon:find("/") == 1 then v.path = "" end
-          local path = v.path .. v.icon
-          widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path)
-        elseif type(v.icon) == "table" then
-          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.path, v.icon[1])
-          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.path, v.icon[2])
-          sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.path, v.icon[3])
-        end
-        count = count + 1
-      end
+  local items = sip.filterByCategory(sip.items, sip.categories)
+  items = sip.filterByText(items, sip.previousSearch)
+
+  for i,v in ipairs(items) do
+    local li = widget.addListItem(sip.widgets.itemList)
+    widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
+    widget.setData(sip.widgets.itemList .. "." .. li, v)
+    widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemRarity", sip.rarities[v.rarity])
+    if type(v.icon) == "string" and v.icon ~= "null" then
+      if v.icon:find("/") == 1 then v.path = "" end
+      local path = v.path .. v.icon
+      widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path)
+    elseif type(v.icon) == "table" then
+      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.path, v.icon[1])
+      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.path, v.icon[2])
+      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.path, v.icon[3])
     end
   end
   
-  sb.logInfo("SIP: Done adding " .. count .. " items to the list!")
+  sb.logInfo("SIP: Done adding " .. #items .. " items to the list!")
 end
 
 --[[
@@ -131,8 +125,9 @@ end
     Items matching one or more category will pass this check.
 ]]
 function sip.filterByCategory(list, categories)
+  if categories == nil then return list end
   if type(categories) == "string" then categories = { [categories] = true }
-  elseif type(categories) == table then categories = Set(categories)
+  elseif type(categories) == "table" then categories = Set(categories)
   else error("SIP: Attempted to filter by an invalid category / invalid categories.") end
   
   local results = {}
@@ -153,6 +148,7 @@ end
 ]]
 function sip.filterByText(list, text)
   if type(text) ~= "string" then error("SIP: Attempted to filter by invalid text.") end
+  if text == "" then return list end
   
   text = text:lower()
   
@@ -173,7 +169,6 @@ end
   @param drawable - Single drawable object. Only the image parameter is used.
 ]]
 function sip.setDrawableIcon(wid, path, drawable)
-  sb.logInfo("%s - %s - %s", wid, path, drawable)
   if not drawable or not drawable.image then return end
   local image = drawable.image
   if image:find("/") == 1 then path = "" end
