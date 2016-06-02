@@ -6,9 +6,13 @@ sip = spawnableItemPack
 ]]
 sip.rarities = {
   common = "/interface/inventory/grayborder.png",
+  commonFlag = "/interface/sip/common.png",
   uncommon = "/interface/inventory/greenborder.png",
+  uncommonFlag = "/interface/sip/uncommon.png",
   rare = "/interface/inventory/blueborder.png",
-  legendary = "/interface/inventory/purpleborder.png"
+  rareFlag = "/interface/sip/rare.png",
+  legendary = "/interface/inventory/purpleborder.png",
+  legendaryFlag = "/interface/sip/legendary.png"
 }
 
 --[[
@@ -110,14 +114,15 @@ function sip.showItems(category)
     widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
     widget.setData(sip.widgets.itemList .. "." .. li, v)
     widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemRarity", sip.rarities[v.rarity])
+    local directives = v.directives or ""
     if type(v.icon) == "string" and v.icon ~= "null" then
       if v.icon:find("/") == 1 then v.path = "" end
       local path = v.path .. v.icon
-      widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path)
+      widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path .. directives)
     elseif type(v.icon) == "table" then
-      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.path, v.icon[1])
-      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.path, v.icon[2])
-      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.path, v.icon[3])
+      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.path, v.icon[1], directives)
+      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.path, v.icon[2], directives)
+      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.path, v.icon[3], directives)
     end
   end
   
@@ -174,11 +179,12 @@ end
   @param path - Item path.
   @param drawable - Single drawable object. Only the image parameter is used.
 ]]
-function sip.setDrawableIcon(wid, path, drawable)
+function sip.setDrawableIcon(wid, path, drawable, directives)
   if not drawable or not drawable.image then drawable = { image = "/assetMissing.png" } end
   local image = drawable.image
   if image:find("/") == 1 then path = "" end
-  widget.setImage(wid, path .. image)
+  directives = directives or ""
+  widget.setImage(wid, path .. image .. directives)
 end
 
 --[[
@@ -346,25 +352,32 @@ function sip.itemSelected()
   if item then config = sip.getItemConfig(item.name) else return end
   -- Config is a parameter of the returned item config.. for reasons.
   config = config and config.config or {}
-    
+  
+  widget.setText("sipLabelSelectionName", item.shortdescription or config.shortdescription or item.name)
   widget.setText(sip.widgets.itemDescription, config.description or sip.descriptionMissing)
   
+  local rarity = item.rarity and item.rarity:lower() or "common"
+  widget.setImage("sipImageSelectionRarity", sip.rarities[rarity .. "Flag"])
+  
+  local directives = item.directives or ""
+  
+  sb.logInfo(directives)
   if type(item.icon) == "string" and item.icon ~= "null" then
     if item.icon:find("/") == 1 then item.path = "" end
     local path = item.path .. item.icon
-    widget.setImage("sipImageSelection", path)
+    widget.setImage("sipImageSelection", path .. directives)
     widget.setImage("sipImageSelection2", "/assetMissing.png")
     widget.setImage("sipImageSelection3", "/assetMissing.png")
-    widget.setImage("sipImageSelectionIcon", path)
+    widget.setImage("sipImageSelectionIcon", path .. directives)
     widget.setImage("sipImageSelectionIcon2", "/assetMissing.png")
     widget.setImage("sipImageSelectionIcon3", "/assetMissing.png")
   elseif type(item.icon) == "table" then
-    sip.setDrawableIcon("sipImageSelection", item.path, item.icon[1])
-    sip.setDrawableIcon("sipImageSelection2", item.path, item.icon[2])
-    sip.setDrawableIcon("sipImageSelection3", item.path, item.icon[3])
-    sip.setDrawableIcon("sipImageSelectionIcon", item.path, item.icon[1])
-    sip.setDrawableIcon("sipImageSelectionIcon2", item.path, item.icon[2])
-    sip.setDrawableIcon("sipImageSelectionIcon3", item.path, item.icon[3])
+    sip.setDrawableIcon("sipImageSelection", item.path, item.icon[1] and item.icon[1] .. directives or "/assetMissing.png")
+    sip.setDrawableIcon("sipImageSelection2", item.path, item.icon[2] and item.icon[2] .. directives or "/assetMissing.png")
+    sip.setDrawableIcon("sipImageSelection3", item.path, item.icon[3] and item.icon[3] .. directives or "/assetMissing.png")
+    sip.setDrawableIcon("sipImageSelectionIcon", item.path, item.icon[1] and item.icon[1] .. directives or "/assetMissing.png")
+    sip.setDrawableIcon("sipImageSelectionIcon2", item.path, item.icon[2] and item.icon[2] .. directives or "/assetMissing.png")
+    sip.setDrawableIcon("sipImageSelectionIcon3", item.path, item.icon[3] and item.icon[3] .. directives or "/assetMissing.png")
   end
 end
 
