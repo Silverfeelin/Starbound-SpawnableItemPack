@@ -70,7 +70,7 @@ end
   Update function, called every game tick by MUI while the interface is opened.
   @param dt - Delay between this and the previous update tick.
 ]]
-function sip.update(dt) 
+function sip.update(dt)
   if not sip.searched then
     sip.searchTick = sip.searchTick - 1
     if sip.searchTick <= 0 then
@@ -102,9 +102,9 @@ end
 function sip.showItems(category) 
   widget.clearListItems(sip.widgets.itemList)
   
-  if type(category) == "nil" then sip.categories = nil
-  elseif type(category) ~= "table" and type(category) ~= "string" then error("SIP: Attempted to search for invalid category")
-  else sip.categories = category end
+  if type(category) == "boolean" and category == false then sip.categories = nil
+  elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error("SIP: Attempted to search for invalid category.")
+  elseif type(category) ~= "nil" then sip.categories = category end
   
   local items = sip.filterByCategory(sip.items, sip.categories)
   items = sip.filterByText(items, sip.previousSearch)
@@ -339,7 +339,7 @@ function sip.selectCategory(w, category)
   else
     widget.setSize("sipCategoryIndex", {0, -1})
     sip.categories = nil
-    sip.showItems()
+    sip.showItems(false)
   end
 end
 
@@ -353,6 +353,10 @@ function sip.itemSelected()
   -- Config is a parameter of the returned item config.. for reasons.
   config = config and config.config or {}
   
+  -- Hide category overlay, to show the item.
+  sip.changingCategory = false
+  sip.showCategories(false)
+  
   widget.setText("sipLabelSelectionName", item.shortdescription or config.shortdescription or item.name)
   widget.setText(sip.widgets.itemDescription, config.description or sip.descriptionMissing)
   
@@ -360,14 +364,19 @@ function sip.itemSelected()
   widget.setImage("sipImageSelectionRarity", sip.rarities[rarity .. "Flag"])
   
   local directives = item.directives or ""
-  
-  sb.logInfo(directives)
+
   if type(item.icon) == "string" and item.icon ~= "null" then
     if item.icon:find("/") == 1 then item.path = "" end
     local path = item.path .. item.icon
-    widget.setImage("sipImageSelection", path .. directives)
-    widget.setImage("sipImageSelection2", "/assetMissing.png")
-    widget.setImage("sipImageSelection3", "/assetMissing.png")
+    if item.category == "headarmour" or item.category == "headwear" then
+      widget.setImage("sipImageSelection", item.path .. "head.png:normal" .. directives)
+      widget.setImage("sipImageSelection2", "/assetMissing.png")
+      widget.setImage("sipImageSelection3", "/assetMissing.png")
+    else
+      widget.setImage("sipImageSelection", path .. directives)
+      widget.setImage("sipImageSelection2", "/assetMissing.png")
+      widget.setImage("sipImageSelection3", "/assetMissing.png")
+    end
     widget.setImage("sipImageSelectionIcon", path .. directives)
     widget.setImage("sipImageSelectionIcon2", "/assetMissing.png")
     widget.setImage("sipImageSelectionIcon3", "/assetMissing.png")
@@ -424,6 +433,8 @@ function sip.showType(_, t)
   }
   if not cats[t] then sb.logError("SIP: Could now show items for the type '" .. t .. "'") return end
   sip.showItems(cats[t])
+  
+  widget.setSelectedOption("sipCategoryScroll.sipCategoryGroup", -1)
 end
 
 --[[

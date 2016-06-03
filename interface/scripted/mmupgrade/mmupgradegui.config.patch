@@ -106,7 +106,6 @@
                 ],
                 "zlevel": 1,
                 "maxSize": [18,18],
-                "minSize": [18,18],
                 "visible": true,
                 "centered": true
               },
@@ -119,7 +118,6 @@
                 ],
                 "zlevel": 1,
                 "maxSize": [18,18],
-                "minSize": [18,18],
                 "visible": true,
                 "centered": true
               },
@@ -132,7 +130,6 @@
                 ],
                 "zlevel": 1,
                 "maxSize": [18,18],
-                "minSize": [18,18],
                 "visible": true,
                 "centered": true
               },
@@ -726,6 +723,15 @@
           "file": "/assetMissing.png?crop;0;0;0;0",
           "visible": true
         },
+        "sipCatoryAnchor2": {
+          "type": "image",
+          "position": [
+            0,
+            -348
+          ],
+          "file": "/assetMissing.png?crop;0;0;0;0",
+          "visible": true
+        },
         "sipCategoryGroup" : {
           "type" : "radioGroup",
           "toggleMode" : true,
@@ -733,6 +739,15 @@
           "position": [0,0],
           "zlevel": 22,
           "buttons" : [
+            {
+              "baseImage" : "/assetMissing.png",
+              "hoverImage" : "/assetMissing.png",
+              "baseImageChecked" : "/assetMissing.png",
+              "hoverImageChecked" : "/assetMissing.png",
+              "pressedOffset" : [0, -1],
+              "position" : [0, 0],
+              "visible" : false
+            },
             {
               "baseImage" : "/interface/sip/categories/vanityhat.png",
               "hoverImage" : "/interface/sip/categories/vanityhat.png?brightness=30",
@@ -822,6 +837,222 @@
               "pressedOffset" : [0, -1],
               "position" : [38, -99],
               "data" : ["ranged", "sniperrifle", "boomerang", "bow", "shotgun", "assaultrifle", "machinepistol", "rocketlauncher", "pistol", "grenadelauncher", "staff", "wand"]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/throwables.png",
+              "hoverImage" : "/interface/sip/categories/throwables.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/throwablesselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/throwablesselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [75, -99],
+              "data" : "throwableitem"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/shields.png",
+              "hoverImage" : "/interface/sip/categories/shields.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/shieldsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/shieldsselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [112, -99],
+              "data" : "shield"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/tech.png",
+              "hoverImage" : "/interface/sip/categories/tech.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/techselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/techselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -132],
+              "data" : [ "tech", "vehiclecontroller", "railplatform" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/upgrade.png",
+              "hoverImage" : "/interface/sip/categories/upgrade.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/upgradeselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/upgradeselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [38, -132],
+              "data" : [ "upgrade", "shiplicense" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/activatable.png",
+              "hoverImage" : "/interface/sip/categories/activatable.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/activatableselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/activatableselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [75, -132],
+              "data" : [ "mysteriousreward", "toy", "clothingdye" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/consumable.png",
+              "hoverImage" : "/interface/sip/categories/consumable.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/consumableselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/consumableselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -165],
+              "data" : [ "consumable", "medicine", "drink", "food", "preparedfood" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/instrument.png",
+              "hoverImage" : "/interface/sip/categories/instrument.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/instrumentselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/instrumentselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -198],
+              "data" : "musicalinstrument"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/tool.png",
+              "hoverImage" : "/interface/sip/categories/tool.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/toolselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/toolselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -231],
+              "data" : [ "tools", "tool" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/other.png",
+              "hoverImage" : "/interface/sip/categories/other.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/otherselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/otherselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -264],
+              "data" : [ "ingredients", "craftingmaterial", "cookingingredient", "upgradecomponent" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/fossil.png",
+              "hoverImage" : "/interface/sip/categories/fossil.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/fossilselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/fossilselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [38, -264],
+              "data" : [ "fossils", "smallfossil", "mediumfossil", "largefossil" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/tech.png",
+              "hoverImage" : "/interface/sip/categories/tech.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/techselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/techselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [75, -264],
+              "data" : [ "eppaugment", "petcollar" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/other.png",
+              "hoverImage" : "/interface/sip/categories/other.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/otherselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/otherselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [112, -264],
+              "data" : [ "miscellaneous", "codex", "quest", "junk", "currency", "trophy", "tradingcard" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/matitems.png",
+              "hoverImage" : "/interface/sip/categories/matitems.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/matitemsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/matitemsselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -297],
+              "data" : [ "blocks", "block", "materials", "liqitem", "supports", "railpoint" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/decoratives.png",
+              "hoverImage" : "/interface/sip/categories/decoratives.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/decorativesselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/decorativesselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [38, -297],
+              "data" : [ "decorative", "actionfigure", "artifact", "breakable", "bug" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/crafting.png",
+              "hoverImage" : "/interface/sip/categories/crafting.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/craftingselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/craftingselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [75, -297],
+              "data" : "crafting"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/spawner.png",
+              "hoverImage" : "/interface/sip/categories/spawner.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/spawnerselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/spawnerselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [112, -297],
+              "data" : "spawner"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/doors.png",
+              "hoverImage" : "/interface/sip/categories/doors.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/doorsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/doorsselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -322],
+              "data" : "door"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/furniture.png",
+              "hoverImage" : "/interface/sip/categories/furniture.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/furnitureselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/furnitureselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [38, -322],
+              "data" : "furniture"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/chests.png",
+              "hoverImage" : "/interface/sip/categories/chests.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/chestsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/chestsselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [75, -322],
+              "data" : "storage"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/lights.png",
+              "hoverImage" : "/interface/sip/categories/lights.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/lightsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/lightsselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [112, -322],
+              "data" : "light"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/traps.png",
+              "hoverImage" : "/interface/sip/categories/traps.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/trapsselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/trapsselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [1, -347],
+              "data" : "trap"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/wired.png",
+              "hoverImage" : "/interface/sip/categories/wired.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/wiredselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/wiredselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [38, -347],
+              "data" : "wire"
+            },
+            {
+              "baseImage" : "/interface/sip/categories/produce.png",
+              "hoverImage" : "/interface/sip/categories/produce.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/produceselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/produceselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [75, -347],
+              "data" : [ "produce", "sapling", "seed" ]
+            },
+            {
+              "baseImage" : "/interface/sip/categories/other.png",
+              "hoverImage" : "/interface/sip/categories/other.png?brightness=30",
+              "baseImageChecked" : "/interface/sip/categories/otherselected.png",
+              "hoverImageChecked" : "/interface/sip/categories/otherselected.png?brightness=30",
+              "pressedOffset" : [0, -1],
+              "position" : [112, -347],
+              "data" : [ "other", "generic", "teleportmarker" ]
             }
           ]
         },
@@ -859,6 +1090,78 @@
           "vAnchor": "top",
           "zlevel": 22,
           "value": "^white;^shadow;Weapons:",
+          "visible": true
+        },
+        "sipLabelCatActivatables": {
+          "type": "label",
+          "position": [
+            1,
+            -100
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Activatables:",
+          "visible": true
+        },
+        "sipLabelCatConsumables": {
+          "type": "label",
+          "position": [
+            1,
+            -133
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Consumables:",
+          "visible": true
+        },
+        "sipLabelCatInstruments": {
+          "type": "label",
+          "position": [
+            1,
+            -166
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Instruments:",
+          "visible": true
+        },
+        "sipLabelCatTools": {
+          "type": "label",
+          "position": [
+            1,
+            -199
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Tools:",
+          "visible": true
+        },
+        "sipLabelCatOther": {
+          "type": "label",
+          "position": [
+            1,
+            -232
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Other:",
+          "visible": true
+        },
+        "sipLabelCatObjects": {
+          "type": "label",
+          "position": [
+            1,
+            -265
+          ],
+          "hAnchor": "left",
+          "vAnchor": "top",
+          "zlevel": 22,
+          "value": "^white;^shadow;Objects:",
           "visible": true
         }
       }
