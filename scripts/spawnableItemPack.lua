@@ -162,13 +162,11 @@ function sip.setPreviewIcon(widgets, item)
       sip.setDrawableIcon(widgets[2], item.path, frames.body .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
       sip.setDrawableIcon(widgets[1], item.path, frames.frontSleeve .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
     elseif category == "legarmour" or category == "legwear" then
-      -- Display mannequin and leggings.
       sip.showDummy(true)
       local cfg = sip.getItemConfig(item.name)
       local frames = cfg.config[sip.gender .. "Frames"]
       sip.setDrawableIcon(widgets[2], item.path, frames .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
     elseif category == "enviroprotectionpack" or category == "backwear" then
-      -- Display mannequin and backpack.
       sip.showDummy(true)
       local cfg = sip.getItemConfig(item.name)
       local frames = cfg.config[sip.gender .. "Frames"]
@@ -176,9 +174,54 @@ function sip.setPreviewIcon(widgets, item)
     else
       -- Hide dummy
       sip.showDummy(false)
+      
       -- Scan item configs for better image.
-      sb.logInfo("%s", sip.getItemConfig(item.name))
-      --error("Item found with unresolved preview image.")
+      local cfg = sip.getItemConfig(item.name)
+      if not cfg then return end
+      
+      sb.logInfo("%s", cfg)
+      if cfg.config.animationParts then
+        local path = nil
+        local l = false
+        for k,v in pairs(cfg.config.animationParts) do
+          if not l then
+            -- Lazy fix for displaying activeitems.
+            local ignoreKeys = { muzzleFlash = true, swoosh = true, handleFullbright = true, chargeEffect = true, middlefullbright = true, discunlit = true, disc = true, apexkey = true, aviankey = true, florankey = true, humankey = true, glitchkey = true, novakidkey = true, hylotlkey = true }
+            if v ~= "" and not ignoreKeys[k] then
+              l = true
+              path = v
+            end
+          end
+        end
+        if path then
+          if item.category == "shield" then
+            sip.setDrawableIcon(widgets[1], item.path, path .. ":nearidle", item.directives)
+          else
+            sip.setDrawableIcon(widgets[1], item.path, path, item.directives)
+          end
+        end
+        
+      elseif cfg.config.orientations then
+        local path = nil
+        local img = cfg.config.orientations[1].image or cfg.config.orientations[1].dualImage or cfg.config.orientations[1].dualImage or cfg.config.orientations[1].leftImage or cfg.config.orientations[1].rightImage or (cfg.config.orientations[1].imageLayers and (cfg.config.orientations[1].imageLayers[1].image or cfg.config.orientations[1].imageLayers[1].dualImage))
+        
+        img = img:match(".-%.png")
+        if img and img ~= "" then
+          if item.frame then img = img .. ":" .. item.frame end
+          sip.setDrawableIcon(widgets[1], item.path, img, item.directives)
+        end
+      elseif cfg.config.largeImage then
+        sip.setDrawableIcon(widgets[1], item.path, cfg.config.largeImage, item.directives)
+      elseif cfg.config.placementPreviewImage then
+        sip.setDrawableIcon(widgets[1], item.path, cfg.config.placementPreviewImage, item.directives)
+      elseif cfg.config.image then
+        sip.setDrawableIcon(widgets[1], item.path, cfg.config.image, item.directives)
+      elseif cfg.config.inventoryIcon then
+        sip.setInventoryIcon(widgets, item)
+        sb.logInfo("SIP: Item %s using inventory icon for preview, as no other icon could be found.", item)
+      else
+        error("Item found with unresolved preview image.") 
+      end
     end
   end
 end
