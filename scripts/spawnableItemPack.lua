@@ -24,7 +24,9 @@ sip.widgets = {
   search = "sipTextSearch",
   categoryBackground = "sipCategoryBackground",
   categoryScrollArea = "sipCategoryScroll",
+  itemName = "sipLabelSelectionName",
   itemDescription = "sipLabelSelectionDescription",
+  itemRarity = "sipImageSelectionRarity",
   itemImage = "sipImageSelection",
   itemImage2 = "sipImageSelection2",
   itemImage3 = "sipImageSelection3"
@@ -44,6 +46,8 @@ function sip.init()
   mui.setTitle("^shadow;Spawnable Item Pack", "^shadow;Spawn anything, for free!")
   mui.setIcon("/interface/sip/icon.png")
   
+  sip.gender = player.gender()
+  
   sip.searchDelay, sip.searchTick = 10, 10
   sip.searched = true
   sip.previousSearch = ""
@@ -53,6 +57,8 @@ function sip.init()
   sip.changingCategory = false
   sip.showCategories(false)
   sip.quantity = 1
+  
+  sip.clearPreview()
   
   -- Synchronize UI with script by checking the dimensions of an invisible widget.
   local category, categoryData = sip.getSelectedCategory()
@@ -87,6 +93,7 @@ end
 ]]
 function sip.uninit()
   sip.showCategories(false)
+  sip.showDummy(false)
 end
 
 -------------------
@@ -113,20 +120,100 @@ function sip.showItems(category)
     local li = widget.addListItem(sip.widgets.itemList)
     widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
     widget.setData(sip.widgets.itemList .. "." .. li, v)
-    widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemRarity", sip.rarities[v.rarity])
-    local directives = v.directives or ""
-    if type(v.icon) == "string" and v.icon ~= "null" then
-      if v.icon:find("/") == 1 then v.path = "" end
-      local path = v.path .. v.icon
-      widget.setImage("sipItemScroll.sipItemList." .. li .. ".itemIcon", path .. directives)
-    elseif type(v.icon) == "table" then
-      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon", v.path, v.icon[1], directives)
-      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon2", v.path, v.icon[2], directives)
-      sip.setDrawableIcon("sipItemScroll.sipItemList." .. li .. ".itemIcon3", v.path, v.icon[3], directives)
-    end
+    widget.setImage(sip.widgets.itemList .. "." .. li .. ".itemRarity", sip.rarities[v.rarity])
+    
+    sip.setInventoryIcon({sip.widgets.itemList .. "." .. li .. ".itemIcon", sip.widgets.itemList .. "." .. li .. ".itemIcon2", sip.widgets.itemList .. "." .. li .. ".itemIcon3"}, v)
   end
   
   sb.logInfo("SIP: Done adding " .. #items .. " items to the list!")
+end
+
+function sip.setInventoryIcon(widgets, item)
+  local directives = item.directives or ""
+  
+  if type(item.icon) == "string" and item.icon ~= "null" then
+      sip.setDrawableIcon(widgets[1], item.path, item.icon, directives)
+      sip.setDrawableIcon(widgets[2])
+      sip.setDrawableIcon(widgets[3])
+    elseif type(item.icon) == "table" then
+      sip.setDrawableIcon(widgets[1], item.path, item.icon[1], directives)
+      sip.setDrawableIcon(widgets[2], item.path, item.icon[2], directives)
+      sip.setDrawableIcon(widgets[3], item.path, item.icon[3], directives)
+    end
+end
+
+function sip.setPreviewIcon(widgets, item)
+  if type(item.icon) == "string" and item.icon ~= "null" then
+    local category = item.category:lower()
+    
+    widget.setImage(widgets[1], "/assetMissing.png")
+    widget.setImage(widgets[2], "/assetMissing.png")
+    widget.setImage(widgets[3], "/assetMissing.png")
+    
+    if category == "headarmour" or category == "headwear" then
+      sip.showDummy(true)
+      widget.setVisible("sipImageDummyHead", true)
+      sip.setDrawableIcon(widgets[1], item.path, "head.png:normal?replace;ffffff00=00000001;00000000=00000001", item.directives)
+    elseif category == "chestarmour" or category == "chestwear" then
+      sip.showDummy(true)
+      local cfg = sip.getItemConfig(item.name)
+      local frames = cfg.config[sip.gender .. "Frames"]
+      sip.setDrawableIcon(widgets[3], item.path, frames.backSleeve .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
+      sip.setDrawableIcon(widgets[2], item.path, frames.body .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
+      sip.setDrawableIcon(widgets[1], item.path, frames.frontSleeve .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
+    elseif category == "legarmour" or category == "legwear" then
+      -- Display mannequin and leggings.
+      sip.showDummy(true)
+      local cfg = sip.getItemConfig(item.name)
+      local frames = cfg.config[sip.gender .. "Frames"]
+      sip.setDrawableIcon(widgets[2], item.path, frames .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
+    elseif category == "enviroprotectionpack" or category == "backwear" then
+      -- Display mannequin and backpack.
+      sip.showDummy(true)
+      local cfg = sip.getItemConfig(item.name)
+      local frames = cfg.config[sip.gender .. "Frames"]
+      sip.setDrawableIcon(widgets[3], item.path, frames .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
+    else
+      -- Hide dummy
+      sip.showDummy(false)
+      -- Scan item configs for better image.
+      sb.logInfo("%s", sip.getItemConfig(item.name))
+      --error("Item found with unresolved preview image.")
+    end
+  end
+end
+
+function sip.clearPreview()
+  local widgets = {"sipImageSelectionIcon", "sipImageSelectionIcon2", "sipImageSelectionIcon3", "sipImageSelection", "sipImageSelection2", "sipImageSelection3"}
+  for _,v in ipairs(widgets) do
+    widget.setImage(v, "/assetMissing.png")
+  end
+  widget.setText(sip.widgets.itemDescription, "Please select an item to view it's details.")
+  widget.setText(sip.widgets.itemName, "No item selected.")
+  widget.setImage(sip.widgets.itemRarity, sip.rarities["commonFlag"])
+  sip.showDummy(false)
+end
+
+function sip.showDummy(bool)
+  widget.setVisible("sipImageDummyFrontArm", bool)
+  widget.setVisible("sipImageDummyBackArm", bool)
+  widget.setVisible("sipImageDummyBody", bool)
+  widget.setVisible("sipImageDummyHead", bool)
+end
+
+--[[
+  Sets a classic drawable formatted image or regular image on the given widget.
+  @param wid - Image widget to apply the drawable to.
+  @param path - Item path.
+  @param drawable - Single drawable object or image path. Only the image parameter is used.
+    Image path can be relative or absolute. All below arguments are valid.
+    path "/" drawable "assetMissing.png" || path "/" drawable "/assetMissing.png" || path "" drawable "/assetMissing.png"
+]]
+function sip.setDrawableIcon(wid, path, drawable, directives)
+  local image = drawable and drawable.image or drawable or "/assetMissing.png"
+  if image:find("/") == 1 then path = "" end
+  directives = directives or ""
+  widget.setImage(wid, path .. image .. directives)
 end
 
 --[[
@@ -171,20 +258,6 @@ function sip.filterByText(list, text)
   end
   
   return results
-end
-
---[[
-  Sets a classic drawable formatted image on the given widget.
-  @param wid - Image widget to apply the drawable to.
-  @param path - Item path.
-  @param drawable - Single drawable object. Only the image parameter is used.
-]]
-function sip.setDrawableIcon(wid, path, drawable, directives)
-  if not drawable or not drawable.image then drawable = { image = "/assetMissing.png" } end
-  local image = drawable.image
-  if image:find("/") == 1 then path = "" end
-  directives = directives or ""
-  widget.setImage(wid, path .. image .. directives)
 end
 
 --[[
@@ -357,37 +430,16 @@ function sip.itemSelected()
   sip.changingCategory = false
   sip.showCategories(false)
   
-  widget.setText("sipLabelSelectionName", item.shortdescription or config.shortdescription or item.name)
+  widget.setText(sip.widgets.itemName, item.shortdescription or config.shortdescription or item.name)
   widget.setText(sip.widgets.itemDescription, config.description or sip.descriptionMissing)
   
   local rarity = item.rarity and item.rarity:lower() or "common"
-  widget.setImage("sipImageSelectionRarity", sip.rarities[rarity .. "Flag"])
+  widget.setImage(sip.widgets.itemRarity, sip.rarities[rarity .. "Flag"])
   
   local directives = item.directives or ""
 
-  if type(item.icon) == "string" and item.icon ~= "null" then
-    if item.icon:find("/") == 1 then item.path = "" end
-    local path = item.path .. item.icon
-    if item.category == "headarmour" or item.category == "headwear" then
-      widget.setImage("sipImageSelection", item.path .. "head.png:normal" .. directives)
-      widget.setImage("sipImageSelection2", "/assetMissing.png")
-      widget.setImage("sipImageSelection3", "/assetMissing.png")
-    else
-      widget.setImage("sipImageSelection", path .. directives)
-      widget.setImage("sipImageSelection2", "/assetMissing.png")
-      widget.setImage("sipImageSelection3", "/assetMissing.png")
-    end
-    widget.setImage("sipImageSelectionIcon", path .. directives)
-    widget.setImage("sipImageSelectionIcon2", "/assetMissing.png")
-    widget.setImage("sipImageSelectionIcon3", "/assetMissing.png")
-  elseif type(item.icon) == "table" then
-    sip.setDrawableIcon("sipImageSelection", item.path, item.icon[1] and item.icon[1] .. directives or "/assetMissing.png")
-    sip.setDrawableIcon("sipImageSelection2", item.path, item.icon[2] and item.icon[2] .. directives or "/assetMissing.png")
-    sip.setDrawableIcon("sipImageSelection3", item.path, item.icon[3] and item.icon[3] .. directives or "/assetMissing.png")
-    sip.setDrawableIcon("sipImageSelectionIcon", item.path, item.icon[1] and item.icon[1] .. directives or "/assetMissing.png")
-    sip.setDrawableIcon("sipImageSelectionIcon2", item.path, item.icon[2] and item.icon[2] .. directives or "/assetMissing.png")
-    sip.setDrawableIcon("sipImageSelectionIcon3", item.path, item.icon[3] and item.icon[3] .. directives or "/assetMissing.png")
-  end
+  sip.setInventoryIcon({"sipImageSelectionIcon", "sipImageSelectionIcon2", "sipImageSelectionIcon3"}, item)
+  sip.setPreviewIcon({"sipImageSelection", "sipImageSelection2", "sipImageSelection3"}, item)
 end
 
 --[[
@@ -512,4 +564,15 @@ function Set (list)
   local set = {}
   for _, l in ipairs(list) do set[l] = true end
   return set
+end
+
+-- Thanks to Magicks
+function player.id()
+  local id = nil
+  pcall(function()
+    local uid = player.ownShipWorldId():match":(.+)"
+    local pos =  world.findUniqueEntity(uid):result()
+    id = world.entityQuery(pos,3,{order = "nearest",includedTypes = {"player"}})[1]
+  end)
+  return id
 end
