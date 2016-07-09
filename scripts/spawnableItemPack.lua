@@ -5,14 +5,16 @@ sip = spawnableItemPack
   Reference list for image paths to inventory icon rarity borders.
 ]]
 sip.rarities = {
-  common = "/interface/inventory/grayborder.png",
+  common = "/interface/inventory/itembordercommon.png",
   commonFlag = "/interface/sip/common.png",
-  uncommon = "/interface/inventory/greenborder.png",
+  uncommon = "/interface/inventory/itemborderuncommon.png",
   uncommonFlag = "/interface/sip/uncommon.png",
-  rare = "/interface/inventory/blueborder.png",
+  rare = "/interface/inventory/itemborderrare.png",
   rareFlag = "/interface/sip/rare.png",
-  legendary = "/interface/inventory/purpleborder.png",
-  legendaryFlag = "/interface/sip/legendary.png"
+  legendary = "/interface/inventory/itemborderlegendary.png",
+  legendaryFlag = "/interface/sip/legendary.png",
+  essential = "/interface/inventory/itemborderessential.png",
+  essentialFlag = "/interface/sip/essential.png"
 }
 
 --[[
@@ -45,21 +47,21 @@ sip.descriptionMissing = "No description could be found for this item."
 function sip.init()
   mui.setTitle("^shadow;Spawnable Item Pack", "^shadow;Spawn anything, for free!")
   mui.setIcon("/interface/sip/icon.png")
-  
+
   sip.gender = player.gender()
-  
+
   sip.searchDelay, sip.searchTick = 10, 10
   sip.searched = true
   sip.previousSearch = ""
-  
+
   sip.items = root.assetJson("/sipItemDump.json")
   sip.categories = nil
   sip.changingCategory = false
   sip.showCategories(false)
   sip.quantity = 1
-  
+
   sip.clearPreview()
-  
+
   -- Synchronize UI with script by checking the dimensions of an invisible widget.
   local category, categoryData = sip.getSelectedCategory()
   if category then
@@ -68,7 +70,7 @@ function sip.init()
   else
     sip.showItems()
   end
-  
+
   --logENV()
 end
 
@@ -106,13 +108,13 @@ end
   @param [category] - String representing a category or table with strings representing a set of categories. Items matching one category will be listed.
     With no argument supplied, uses the sip.categories value instead. If sip.categories is nil, displays all items filtered by text.
 ]]
-function sip.showItems(category) 
+function sip.showItems(category)
   widget.clearListItems(sip.widgets.itemList)
-  
+
   if type(category) == "boolean" and category == false then sip.categories = nil
   elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error("SIP: Attempted to search for invalid category.")
   elseif type(category) ~= "nil" then sip.categories = category end
-  
+
   local items = sip.filterByCategory(sip.items, sip.categories)
   items = sip.filterByText(items, sip.previousSearch)
 
@@ -121,16 +123,16 @@ function sip.showItems(category)
     widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
     widget.setData(sip.widgets.itemList .. "." .. li, v)
     widget.setImage(sip.widgets.itemList .. "." .. li .. ".itemRarity", sip.rarities[v.rarity])
-    
+
     sip.setInventoryIcon({sip.widgets.itemList .. "." .. li .. ".itemIcon", sip.widgets.itemList .. "." .. li .. ".itemIcon2", sip.widgets.itemList .. "." .. li .. ".itemIcon3"}, v)
   end
-  
+
   sb.logInfo("SIP: Done adding " .. #items .. " items to the list!")
 end
 
 function sip.setInventoryIcon(widgets, item)
   local directives = item.directives or ""
-  
+
   if type(item.icon) == "string" and item.icon ~= "null" then
       sip.setDrawableIcon(widgets[1], item.path, item.icon, directives)
       sip.setDrawableIcon(widgets[2])
@@ -145,11 +147,11 @@ end
 function sip.setPreviewIcon(widgets, item)
   if type(item.icon) == "string" and item.icon ~= "null" then
     local category = item.category:lower()
-    
+
     widget.setImage(widgets[1], "/assetMissing.png")
     widget.setImage(widgets[2], "/assetMissing.png")
     widget.setImage(widgets[3], "/assetMissing.png")
-    
+
     if category == "headarmour" or category == "headwear" then
       sip.showDummy(true)
       widget.setVisible("sipImageDummyHead", true)
@@ -174,25 +176,25 @@ function sip.setPreviewIcon(widgets, item)
     else
       -- Hide dummy
       sip.showDummy(false)
-      
+
       -- Scan item configs for better image.
       local cfg = sip.getItemConfig(item.name)
       if not cfg then return end
-      
-      sb.logInfo("%s", cfg)
+
       if cfg.config.animationParts then
         local path = nil
         local l = false
         for k,v in pairs(cfg.config.animationParts) do
           if not l then
             -- Lazy fix for displaying activeitems.
-            local ignoreKeys = { muzzleFlash = true, swoosh = true, handleFullbright = true, chargeEffect = true, middlefullbright = true, discunlit = true, disc = true, apexkey = true, aviankey = true, florankey = true, humankey = true, glitchkey = true, novakidkey = true, hylotlkey = true }
+            local ignoreKeys = { muzzleFlash = true, swoosh = true, handleFullbright = true, detectorfullbright = true, gunfullbright = true, bladefullbright = true, beamorigin = true, chargeEffect = true, stone = true, middlefullbright = true, discunlit = true, disc = true, apexkey = true, aviankey = true, florankey = true, humankey = true, glitchkey = true, novakidkey = true, hylotlkey = true }
             if v ~= "" and not ignoreKeys[k] then
               l = true
               path = v
             end
           end
         end
+        if not path then path = cfg.config.inventoryIcon end
         if path then
           if item.category == "shield" then
             sip.setDrawableIcon(widgets[1], item.path, path .. ":nearidle", item.directives)
@@ -200,11 +202,11 @@ function sip.setPreviewIcon(widgets, item)
             sip.setDrawableIcon(widgets[1], item.path, path, item.directives)
           end
         end
-        
+
       elseif cfg.config.orientations then
         local path = nil
         local img = cfg.config.orientations[1].image or cfg.config.orientations[1].dualImage or cfg.config.orientations[1].dualImage or cfg.config.orientations[1].leftImage or cfg.config.orientations[1].rightImage or (cfg.config.orientations[1].imageLayers and (cfg.config.orientations[1].imageLayers[1].image or cfg.config.orientations[1].imageLayers[1].dualImage))
-        
+
         img = img:match(".-%.png")
         if img and img ~= "" then
           if item.frame then img = img .. ":" .. item.frame end
@@ -220,7 +222,7 @@ function sip.setPreviewIcon(widgets, item)
         sip.setInventoryIcon(widgets, item)
         sb.logInfo("SIP: Item %s using inventory icon for preview, as no other icon could be found.", item)
       else
-        error("Item found with unresolved preview image.") 
+        error("Item found with unresolved preview image.")
       end
     end
   end
@@ -270,14 +272,14 @@ function sip.filterByCategory(list, categories)
   if type(categories) == "string" then categories = { [categories] = true }
   elseif type(categories) == "table" then categories = Set(categories)
   else error("SIP: Attempted to filter by an invalid category / invalid categories.") end
-  
+
   local results = {}
   for _,v in pairs(list) do
     if categories[v.category:lower()] then
       table.insert(results, v)
     end
   end
-  
+
   return results
 end
 
@@ -290,16 +292,16 @@ end
 function sip.filterByText(list, text)
   if type(text) ~= "string" then error("SIP: Attempted to filter by invalid text.") end
   if text == "" then return list end
-  
+
   text = text:lower()
-  
+
   local results = {}
   for _,v in pairs(list) do
     if v.shortdescription:lower():find(text) or v.name:lower():find(text) then
       table.insert(results, v)
     end
   end
-  
+
   return results
 end
 
@@ -310,9 +312,9 @@ end
 function sip.filter()
   local filter = widget.getText(sip.widgets.search)
   if filter == sip.previousSearch then return end
-  
+
   sip.previousSearch = filter
-  
+
   sip.showItems()
 end
 
@@ -448,7 +450,7 @@ function sip.selectCategory(w, category)
   local selecting = index[1] == 0
   local selected = index[2]
   local newSelection = tonumber(w)
-  
+
   if selecting or newSelection ~= selected then
     widget.setSize("sipCategoryIndex", {1, newSelection})
     sip.showItems(category)
@@ -468,17 +470,17 @@ function sip.itemSelected()
   if item then config = sip.getItemConfig(item.name) else return end
   -- Config is a parameter of the returned item config.. for reasons.
   config = config and config.config or {}
-  
+
   -- Hide category overlay, to show the item.
   sip.changingCategory = false
   sip.showCategories(false)
-  
+
   widget.setText(sip.widgets.itemName, item.shortdescription or config.shortdescription or item.name)
   widget.setText(sip.widgets.itemDescription, config.description or sip.descriptionMissing)
-  
+
   local rarity = item.rarity and item.rarity:lower() or "common"
   widget.setImage(sip.widgets.itemRarity, sip.rarities[rarity .. "Flag"])
-  
+
   local directives = item.directives or ""
 
   sip.setInventoryIcon({"sipImageSelectionIcon", "sipImageSelectionIcon2", "sipImageSelectionIcon3"}, item)
@@ -496,7 +498,7 @@ function sip.changeQuantity(_, data)
     local str = widget.getText(sip.widgets.quantity):gsub("x","")
     local n = tonumber(str)
     if n then sip.setQuantity(n) end
-  end  
+  end
 end
 
 --[[
@@ -508,10 +510,10 @@ end
 function sip.print()
   local item, q = sip.getSelectedItem(), sip.getQuantity()
   if not item or not item.name then return end
-  
+
   local cfg = sip.getItemConfig(item.name)
   if cfg and cfg.config.maxStack == 1 then q = 1 end
-  
+
   sip.spawnItem(item.name, q)
 end
 
@@ -528,7 +530,7 @@ function sip.showType(_, t)
   }
   if not cats[t] then sb.logError("SIP: Could now show items for the type '" .. t .. "'") return end
   sip.showItems(cats[t])
-  
+
   widget.setSelectedOption("sipCategoryScroll.sipCategoryGroup", -1)
 end
 
