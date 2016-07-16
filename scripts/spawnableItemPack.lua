@@ -258,6 +258,7 @@ function sip.setDrawableIcon(wid, path, drawable, directives)
   local image = drawable and drawable.image or drawable or "/assetMissing.png"
   if image:find("/") == 1 then path = "" end
   directives = directives or ""
+  if not pcall(root.imageSize,path .. image) then image = "/assetMissing.png"; path = "" end
   widget.setImage(wid, path .. image .. directives)
 end
 
