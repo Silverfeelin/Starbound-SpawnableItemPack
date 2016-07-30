@@ -7,6 +7,7 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 - [Features](#features)
 - [Planned](#planned)
 - [Potential Issues](#potential-issues)
+- [Fatal Exception](#fatal-exception)
 - [Contributing](#contributing)
 
 ## Installation
@@ -46,6 +47,10 @@ You can only select one category at once. Deselecting the current category is po
 ## Potential Issues
 * Game updates that remove items may cause issues, as the mod uses it's own item dump to populate lists.
 * Game updates that add items requires an update to the item dump to show in SIP.
+
+## Fatal Exception
+If you're greeted with a fatal exception after installing the mod, this most likely means you did not install the Manipulated UI dependency. Please read the Installation steps carefully.
+The Manipulated UI dependency can be downloaded from [the official repository](https://github.com/Silverfeelin/Starbound-ManipulatedUI/releases), but is also bundled with [each release](https://github.com/Silverfeelin/SpawnableItemPack/releases).
 
 ## Contributing
 If you have any suggestions or feedback that might help improve this mod, please do post them [on the discussion page](http://community.playstarbound.com/resources/spawnable-item-pack-spawn-all-items-for-free.515/)!
