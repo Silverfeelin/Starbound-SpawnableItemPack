@@ -47,6 +47,9 @@ You can only select one category at once. Deselecting the current category is po
 ## Potential Issues
 * Game updates that remove items may cause issues, as the mod uses it's own item dump to populate lists.
 * Game updates that add items requires an update to the item dump to show in SIP.
+* Mixing Steam Workshop and GitHub releases may cause load order issues.
+ * If you install Manipulated UI in the Workshop and Spawnable Item Pack here, it will cause a fatal exception. Hopefully Chucklefish will fix this, but the solution is to install Spawnable Item Pack through the Workshop *or* download and install Manipulated UI from GitHub.
+ * Installing Manipulated UI from GitHub **and** the Steam Workshop doesn't seem to hurt.
 
 ## Fatal Exception
 If you're greeted with a fatal exception after installing the mod, this most likely means you did not install the Manipulated UI dependency. Please read the Installation steps carefully.
