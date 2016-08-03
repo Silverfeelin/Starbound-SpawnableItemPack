@@ -4,7 +4,7 @@
   "friendlyName" : "Spawnable Item Pack",
   "includes" : [],
   "name" : "SpawnableItemPack",
-  "priority" : 0,
+  "priority" : -1,
   "requires" : ["Manipulated UI"],
   "version" : "1.0.3.1",
   "link" : "steam://url/CommunityFilePage/733665104",

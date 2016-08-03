@@ -880,7 +880,7 @@
                 1,
                 -33
               ],
-              "data": "headwear"
+              "data": [ "headwear", "head" ]
             },
             {
               "baseImage": "/interface/sip/categories/vanitychest.png",
@@ -895,7 +895,7 @@
                 38,
                 -33
               ],
-              "data": "chestwear"
+              "data": [ "chestwear", "chest" ]
             },
             {
               "baseImage": "/interface/sip/categories/vanitypants.png",
@@ -910,7 +910,7 @@
                 75,
                 -33
               ],
-              "data": "legwear"
+              "data": [ "legwear", "legs" ]
             },
             {
               "baseImage": "/interface/sip/categories/vanityback.png",
@@ -925,7 +925,7 @@
                 112,
                 -33
               ],
-              "data": "backwear"
+              "data": [ "backwear", "back" ]
             },
             {
               "baseImage": "/interface/sip/categories/armorhelm.png",
@@ -940,7 +940,7 @@
                 1,
                 -66
               ],
-              "data": "headarmour"
+              "data": [ "headarmour", "head" ]
             },
             {
               "baseImage": "/interface/sip/categories/armorchest.png",
@@ -955,7 +955,7 @@
                 38,
                 -66
               ],
-              "data": "chestarmour"
+              "data": [ "chestarmour", "chest" ]
             },
             {
               "baseImage": "/interface/sip/categories/armorpants.png",
@@ -970,7 +970,7 @@
                 75,
                 -66
               ],
-              "data": "legarmour"
+              "data": [ "legarmour", "legs" ]
             },
             {
               "baseImage": "/interface/sip/categories/envirormental.png",

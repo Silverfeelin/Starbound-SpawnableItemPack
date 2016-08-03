@@ -55,6 +55,29 @@ function sip.init()
   sip.previousSearch = ""
 
   sip.items = root.assetJson("/sipItemDump.json")
+  sip.customItems = root.assetJson("/sipCustomItems.json")
+  
+  -- Simple check for the first custom item to exist. Will obviously not catch all missing items.
+  -- If the first custom item does not exist, do not load /any/ custom items.
+  if #sip.customItems == 0 then
+    sip.customItems = nil
+  else
+    if not sip.customItems[1].name then
+      sb.logError("Spawnable Item pack did not load custom items, as a custom item was found with no 'name' set.")
+      sip.customItems = nil
+    elseif not pcall(function()
+      root.itemConfig(sip.customItems[1].name)
+    end) then
+      sb.logError("Spawnable Item Pack did not load custom items, as the '%s' item could not be found.", sip.customItems[1].name)
+      sip.customItems = nil
+    else
+      for k,v in ipairs(sip.customItems) do
+        table.insert(sip.items, v)
+        sb.logInfo("%s", v)
+      end
+    end
+  end
+  
   sip.categories = nil
   sip.changingCategory = false
   sip.showCategories(false)
@@ -115,7 +138,8 @@ function sip.showItems(category)
   elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error("SIP: Attempted to search for invalid category.")
   elseif type(category) ~= "nil" then sip.categories = category end
 
-  local items = sip.filterByCategory(sip.items, sip.categories)
+  local items = sip.items
+  items = sip.filterByCategory(sip.items, sip.categories)
   items = sip.filterByText(items, sip.previousSearch)
 
   for i,v in ipairs(items) do
@@ -152,23 +176,23 @@ function sip.setPreviewIcon(widgets, item)
     widget.setImage(widgets[2], "/assetMissing.png")
     widget.setImage(widgets[3], "/assetMissing.png")
 
-    if category == "headarmour" or category == "headwear" then
+    if category == "headarmour" or category == "headwear" or category == "head" then
       sip.showDummy(true)
       widget.setVisible("sipImageDummyHead", true)
       sip.setDrawableIcon(widgets[1], item.path, "head.png:normal?replace;ffffff00=00000001;00000000=00000001", item.directives)
-    elseif category == "chestarmour" or category == "chestwear" then
+    elseif category == "chestarmour" or category == "chestwear" or category == "chest" then
       sip.showDummy(true)
       local cfg = sip.getItemConfig(item.name)
       local frames = cfg.config[sip.gender .. "Frames"]
       sip.setDrawableIcon(widgets[3], item.path, frames.backSleeve .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
       sip.setDrawableIcon(widgets[2], item.path, frames.body .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
       sip.setDrawableIcon(widgets[1], item.path, frames.frontSleeve .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
-    elseif category == "legarmour" or category == "legwear" then
+    elseif category == "legarmour" or category == "legwear" or category == "legs" then
       sip.showDummy(true)
       local cfg = sip.getItemConfig(item.name)
       local frames = cfg.config[sip.gender .. "Frames"]
       sip.setDrawableIcon(widgets[2], item.path, frames .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
-    elseif category == "enviroprotectionpack" or category == "backwear" then
+    elseif category == "enviroprotectionpack" or category == "backwear" or category == "back" then
       sip.showDummy(true)
       local cfg = sip.getItemConfig(item.name)
       local frames = cfg.config[sip.gender .. "Frames"]
