@@ -73,7 +73,6 @@ function sip.init()
     else
       for k,v in ipairs(sip.customItems) do
         table.insert(sip.items, v)
-        sb.logInfo("%s", v)
       end
     end
   end
@@ -94,6 +93,12 @@ function sip.init()
     sip.showItems()
   end
 
+  local levelStr = widget.getText("sipSettingsScroll.weaponLevel")
+  local weaponLevel = tonumber(levelStr)
+  if weaponLevel then
+    sip.weaponLevel = weaponLevel
+  end
+  
   --logENV()
 end
 
@@ -350,11 +355,25 @@ end
   @param quantity - Amount of items to spawn. Loops every 1000 to work around the engine's limit.
 ]]
 function sip.spawnItem(itemName, quantity)
+  local weaponLevel = nil
+  if not pcall(function()
+    local cfg = root.itemConfig(itemName)
+    if cfg.config and cfg.config.level then
+      weaponLevel = sip.weaponLevel
+    end
+  end) then
+    sb.logError("Spawnable Item Pack could not spawn the item '%s', as it does not appear to exist.", itemName)
+    return
+  end
+  
+  local params = nil
+  if weaponLevel then params = { level = weaponLevel } end
+  
   local it, rest = math.floor(quantity / 1000), quantity % 1000
   for i=1,it do
-    player.giveItem({name=itemName, count=1000})
+    player.giveItem({name=itemName, count=1000, parameters = params })
   end
-  player.giveItem({name=itemName, count=rest})
+  player.giveItem({name=itemName, count=rest, parameters = params })
 end
 
 --[[
@@ -527,6 +546,26 @@ function sip.changeQuantity(_, data)
 end
 
 --[[
+  Widget callback function. Parses widget data. If this is a number, adjust quantity by it.
+  If this is not a number, fetch quantity from the text field instead.
+]]
+function sip.changeWeaponLevel(_, data)
+  local level = 1
+  if type(data) == "number" then
+    level = (sip.weaponLevel or 1) + data
+  else
+    local str = widget.getText("sipSettingsScroll.weaponLevel")
+    local n = tonumber(str)
+    if n then
+      level = n
+    else return end
+  end
+  
+  sip.weaponLevel = math.clamp(level, 1, 10)
+  widget.setText("sipSettingsScroll.weaponLevel", tostring(sip.weaponLevel))
+end
+
+--[[
   Widget callback function. Spawns the current quantity of the current item.
   If the max stack size of the item is 1, spawn 1 instead.
   Logs an error if this item could not be spawned, by checking if it has an item configuration.
@@ -580,7 +619,7 @@ end
   Sets the background body image to the default one of MUI.
 ]]
 function sip.settingsOpened()
-  widget.setImage("bgb", "/resources/blankbody.png")
+  widget.setImage("bgb", "/interface/sip/settingsBody.png")
   sip.showCategories(false)
 end
 

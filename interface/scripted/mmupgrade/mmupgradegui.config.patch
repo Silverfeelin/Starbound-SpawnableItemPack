@@ -1578,6 +1578,129 @@
   },
   {
     "op": "add",
+    "path": "/gui/sipSettingsScroll",
+    "value": {
+      "type": "scrollArea",
+      "zlevel": 41,
+      "rect": [
+        1,
+        23,
+        334,
+        218
+      ],
+      "children": {
+        "settingsAnchor": {
+          "type": "image",
+          "position": [
+            0,
+            0
+          ],
+          "file": "/assetMissing.png?crop;0;0;0;0",
+          "visible": true
+        },
+        "bg" : {
+          "type": "image",
+          "file": "/interface/sip/settingsBackground.png",
+          "centered": false,
+          "position": [
+            0,
+            0
+          ],
+          "visible": true
+        },
+        "labelSuggestion": {
+          "type": "label",
+          "position": [
+            167,
+            33
+          ],
+          "hAnchor": "mid",
+          "vAnchor": "top",
+          "zlevel": 20,
+          "value": "^white;^shadow;Pretty empty, is it not?\nPlease suggest features at:\nSilverMods.com/SIP/suggestion"
+        },
+        "labelWeaponLevel": {
+          "type": "label",
+          "position": [
+            138,
+            -13
+          ],
+          "hAnchor": "mid",
+          "zlevel": 20,
+          "value": "^white;^shadow;Weapon Level:"
+        },
+        "imageWeaponLevel": {
+          "type": "image",
+          "file": "/interface/sip/printamount.png",
+          "position": [
+            179,
+            -14
+          ],
+          "zlevel": 20,
+          "visible": true
+        },
+        "weaponLevelLess": {
+          "type": "button",
+          "base": "/interface/sip/less.png",
+          "hover": "/interface/sip/less.png?brightness=30",
+          "caption": "",
+          "fontSize": 7,
+          "wrapWidth": 80,
+          "hAnchor": "mid",
+          "zlevel": 20,
+          "data": -1,
+          "visible": true,
+          "pressedOffset": [
+            0,
+            -1
+          ],
+          "position": [
+            167,
+            -14
+          ],
+          "callback": "sip.changeWeaponLevel"
+        },
+        "weaponLevelMore": {
+          "type": "button",
+          "base": "/interface/sip/more.png",
+          "hover": "/interface/sip/more.png?brightness=30",
+          "caption": "",
+          "fontSize": 7,
+          "wrapWidth": 80,
+          "hAnchor": "mid",
+          "zlevel": 20,
+          "data": 1,
+          "visible": true,
+          "pressedOffset": [
+            0,
+            -1
+          ],
+          "position": [
+            215,
+            -14
+          ],
+          "callback": "sip.changeWeaponLevel"
+        },
+        "weaponLevel": {
+          "type": "textbox",
+          "position": [
+            155,
+            -13
+          ],
+          "textAlign": "center",
+          "hint": "",
+          "value": "1",
+          "zlevel": 21,
+          "maxWidth": 75,
+          "regex": "\\d{0,2}",
+          "callback": "sip.changeWeaponLevel"
+        }
+      },
+      "visible": false
+    }
+  },
+  {
+    "op": "add",
     "path": "/packages/-",
     "value": {
       "activator": "btnSIP",
@@ -1612,7 +1735,10 @@
         "sipLabelSelectionDescription"
       ],
       "hide": [],
-      "settingControls": [],
+      "settingsEnabled": true,
+      "settingControls": [
+        "sipSettingsScroll"
+      ],
       "update": {
         "bgb": "/interface/sip/body.png",
         "bgh": "/interface/sip/header.png",
@@ -1666,5 +1792,10 @@
     "op": "add",
     "path": "/scriptWidgetCallbacks/-",
     "value": "sip.selectCategory"
+  },
+  {
+    "op": "add",
+    "path": "/scriptWidgetCallbacks/-",
+    "value": "sip.changeWeaponLevel"
   }
 ]
