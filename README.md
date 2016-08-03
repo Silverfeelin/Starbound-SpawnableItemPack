@@ -40,9 +40,34 @@ You can only select one category at once. Deselecting the current category is po
 * Filter items by categories.
 * Filter items by item identifiers or names.
 
+## Adding items
+
+There's a lot of custom items out there, and no easy way for us to fetch all items in-game automatically! This repository comes with a project that allows Windows users to easily generate a JSON patch for items found in an asset folder. This allows us to create a patch file that will add these items to the Wardrobe.
+
+To use this application, you'll want to download the contents of /SpawnableItemFetcher/build/ and put them somewhere on your computer. All files in the directory are necessary to run the application!
+
+#### Usage
+* Open `create_patch.bat` in a text editor.
+* Set the first path to an asset path. The assets you want to scan should be unpacked first.
+ * EG. `D:\Steam\steamapps\common\Starbound\mods\MyMod`
+* Set the second path to the output file. Make sure all directories leading up to the file exist!
+* EG. `D:\Steam\steamapps\common\Starbound\mods\MyMod\sipCustomItems.json.patch`
+* Save and run the batch file.
+* If the application asks you to overwrite the file as it already exists, make your selection.
+
+Patch files can easily be used to add items without modifying the SpawnableItemPack mod. For this you'll want to include the SpawnableItemPack mod in your `.metadata` file. This allows the mod to function fine without the SpawnableItemPack mod, but if the SpawnableItemPack mod is present the patch will be applied automatically since it ensures the SpawnableItemPack mod is loaded first.
+```json
+  "includes" : [
+    "SpawnableItemPack"
+  ]
+```
+You'll want to name and place the patch file at the following location:
+`../mods/<modName>/sipCustomItems.json.patch`
+
 ## Planned
 * Fixing preview images. This includes icons for random weapons, and single-frame previews.
-* Easily allow mods to add items (and categories). It is already probably possible, so maybe only documentation is necessary.
+* Custom categories, for items from mods.
+* Level selection for weapons.
 
 ## Potential Issues
 * Game updates that remove items may cause issues, as the mod uses it's own item dump to populate lists.
