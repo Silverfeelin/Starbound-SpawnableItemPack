@@ -5,6 +5,7 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
+- [Adding Items](#adding-items)
 - [Planned](#planned)
 - [Potential Issues](#potential-issues)
 - [Fatal Exception](#fatal-exception)
