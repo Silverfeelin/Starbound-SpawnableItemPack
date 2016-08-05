@@ -837,7 +837,7 @@
           "type": "image",
           "position": [
             0,
-            -348
+            -373
           ],
           "file": "/assetMissing.png?crop;0;0;0;0",
           "visible": true
@@ -1460,10 +1460,38 @@
               "data": [
                 "other",
                 "generic",
-                "teleportmarker",
-                "platform",
-                "liquid"
+                "teleportmarker"
               ]
+            },
+            {
+              "baseImage": "/interface/sip/categories/platforms.png",
+              "hoverImage": "/interface/sip/categories/platforms.png?brightness=30",
+              "baseImageChecked": "/interface/sip/categories/platformsselected.png",
+              "hoverImageChecked": "/interface/sip/categories/platformsselected.png?brightness=30",
+              "pressedOffset": [
+                0,
+                -1
+              ],
+              "position": [
+                1,
+                -372
+              ],
+              "data": "platform"
+            },
+            {
+              "baseImage": "/interface/sip/categories/liquids.png",
+              "hoverImage": "/interface/sip/categories/liquids.png?brightness=30",
+              "baseImageChecked": "/interface/sip/categories/liquidsselected.png",
+              "hoverImageChecked": "/interface/sip/categories/liquidsselected.png?brightness=30",
+              "pressedOffset": [
+                0,
+                -1
+              ],
+              "position": [
+                38,
+                -372
+              ],
+              "data": "liquid"
             }
           ]
         },
@@ -1703,6 +1731,38 @@
   },
   {
     "op": "add",
+    "path": "/gui/sipLabelSettings",
+    "value": {
+      "type": "label",
+      "position": [
+        210,
+        235
+      ],
+      "hAnchor": "left",
+      "vAnchor": "top",
+      "zlevel": 25,
+      "value": "^white;^shadow;Advanced Settings:",
+      "visible": true
+    }
+  },
+  {
+    "op": "add",
+    "path": "/gui/sipLabelSettingsReturn",
+    "value": {
+      "type": "label",
+      "position": [
+        259,
+        235
+      ],
+      "hAnchor": "left",
+      "vAnchor": "top",
+      "zlevel": 25,
+      "value": "^white;^shadow;Return:",
+      "visible": false
+    }
+  },
+  {
+    "op": "add",
     "path": "/packages/-",
     "value": {
       "activator": "btnSIP",
@@ -1734,12 +1794,14 @@
         "sipImageSelectionIcon3",
         "sipImageSelectionRarity",
         "sipLabelSelectionName",
-        "sipLabelSelectionDescription"
+        "sipLabelSelectionDescription",
+        "sipLabelSettings"
       ],
       "hide": [],
       "settingsEnabled": true,
       "settingControls": [
-        "sipSettingsScroll"
+        "sipLabelSettingsReturn",
+        "sipSettingsScroll"        
       ],
       "update": {
         "bgb": "/interface/sip/body.png",
