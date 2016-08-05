@@ -358,8 +358,21 @@ function sip.spawnItem(itemName, quantity)
   local weaponLevel = nil
   if not pcall(function()
     local cfg = root.itemConfig(itemName)
-    if cfg.config and cfg.config.level then
-      weaponLevel = sip.weaponLevel
+    
+    if cfg.config then
+      if cfg.config.level then
+        weaponLevel = sip.weaponLevel
+      elseif cfg.config.itemTags then
+        -- Added check for "weapon" itemTag, since not all weapons that support the level parameter
+        -- contain it in their default configuration.
+        for k,v in ipairs(cfg.config.itemTags) do
+          if v:lower() == "weapon" then
+            weaponLevel = sip.weaponLevel
+            goto done
+          end
+        end
+        ::done::
+      end
     end
   end) then
     sb.logError("Spawnable Item Pack could not spawn the item '%s', as it does not appear to exist.", itemName)
