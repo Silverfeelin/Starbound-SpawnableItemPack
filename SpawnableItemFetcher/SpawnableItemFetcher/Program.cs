@@ -176,14 +176,21 @@ namespace SpawnableItemFetcher
                 JArray cs = (JArray)colors;
                 if (cs.Count() > 0)
                 {
-                    JObject color = (JObject)colors[0];
-                    string dir = "?replace";
-                    foreach (var c in color)
+                    try
                     {
-                        dir += ";" + c.Key + "=" + c.Value;
-                    }
+                        JObject color = (JObject)colors[0];
+                        string dir = "?replace";
+                        foreach (var c in color)
+                        {
+                            dir += ";" + c.Key + "=" + c.Value;
+                        }
 
-                    newItem["directives"] = dir;
+                        newItem["directives"] = dir;
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 
