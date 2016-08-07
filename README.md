@@ -14,7 +14,7 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 ## Installation
 * [Download](https://github.com/Silverfeelin/SpawnableItemPack/releases) the release for the current version of Starbound.
 * Place the `SpawnableItemPack.pak` file in your mods folder (eg. `D:\Steam\steamapps\common\Starbound\mods\`). Overwrite the existing file if necessary.
-* Optionally, place the `ManipulatedUI.pak` in the same mods folder. This is only necessary if you don't have this mod yet (or your version is outdated).
+* Optionally, place the `ManipulatedUI.pak` in the same mods folder. This step is necessary if you don't have this mod yet (or your version is outdated).
  * This file is included in the zipped release.
 
 ## Usage
