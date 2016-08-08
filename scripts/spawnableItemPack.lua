@@ -85,6 +85,10 @@ function sip.init()
   sip.clearPreview()
 
   -- Synchronize UI with script by checking the dimensions of an invisible widget.
+  sip.previousSearch = ""
+  sip.filter()
+  sip.changeQuantity()
+  
   local category, categoryData = sip.getSelectedCategory()
   if category then
     widget.setSize("sipCategoryIndex", {0,0})
