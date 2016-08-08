@@ -229,15 +229,17 @@ namespace SpawnableItemFetcher
             if (category == "Upgrade Component")
                 category = "upgradeComponent";
 
-            if (category == "uniqueWeapon")
+            if (category.ToLower() == "uniqueweapon" || category.ToLower() == "activeitem")
             {
                 JArray tags = (JArray)item.SelectToken("itemTags");
-                if (tags.Values().Contains("ranged"))
+                if (tags != null && tags.Values().Contains("ranged"))
                     category = "ranged";
-                else if (tags.Values().Contains("melee"))
+                else if (tags != null && tags.Values().Contains("melee"))
                     category = "melee";
+                else if (tags != null && tags.Values().Contains("shield"))
+                    category = "shield";
                 else
-                    Console.WriteLine("Specific category for " + item["shortdescription"].Value<string>() + " could not be found. Using 'uniqueWeapon' instead.");
+                    Console.WriteLine("Specific category for " + item["shortdescription"].Value<string>() + " could not be found. Using '" + category + "' instead.");
             }
             if (category == "uniqueWeapon")
             {
