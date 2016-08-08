@@ -68,7 +68,6 @@ You'll want to name and place the patch file at the following location:
 ## Planned
 * Fixing preview images. This includes icons for random weapons, and single-frame previews.
 * Custom categories, for items from mods.
-* Level selection for weapons.
 
 ## Potential Issues
 * Game updates that remove items may cause issues, as the mod uses it's own item dump to populate lists.
