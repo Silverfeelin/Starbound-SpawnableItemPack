@@ -84,7 +84,7 @@ function sip.init()
 
   sip.clearPreview()
 
-  -- Synchronize UI with script by checking the dimensions of an invisible widget.
+  -- Synchronize UI with script
   sip.previousSearch = ""
   sip.filter()
   sip.changeQuantity()
