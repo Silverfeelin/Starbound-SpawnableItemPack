@@ -40,9 +40,10 @@ You can only select one category at once. Deselecting the current category is po
 * Spawn any item in any quantity.
 * Filter items by categories.
 * Filter items by item identifiers or names.
+* Change settings such as the level of generated weapons in the advanced settings menu.
+ * You can open this menu by selecting the cog in the top right corner of the interface.
 
 ## Adding items
-
 There's a lot of custom items out there, and no easy way for us to fetch all items in-game automatically! This repository comes with a project that allows Windows users to easily generate a JSON patch for items found in an asset folder. This allows us to create a patch file that will add these items to the Wardrobe.
 
 To use this application, you'll want to download the contents of /SpawnableItemFetcher/build/ and put them somewhere on your computer. All files in the directory are necessary to run the application!
