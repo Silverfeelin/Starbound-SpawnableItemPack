@@ -79,6 +79,8 @@ function sip.init()
     end
   end
   
+  sip.loadModItems(sip.items)
+  
   sip.categories = nil
   sip.changingCategory = false
   sip.showCategories(false)
@@ -108,6 +110,22 @@ function sip.init()
   --logENV()
 end
 
+function sip.loadModItems(itemList)
+  itemList = itemList or {}
+  for _,modFile in ipairs(root.assetJson("/sipMods/load.config")) do
+    local items = root.assetJson("/sipMods/" .. modFile)
+    if #items > 0 then
+      if pcall(function() root.itemConfig(items[1].name) end) then
+        for i,v in ipairs(items) do
+          table.insert(itemList, v)
+        end
+      sb.logInfo(sip.lines.modAdded, modFile)
+      end
+    end
+  end
+  
+  return itemList
+end
 --[[
   Update function, called every game tick by MUI while the interface is opened.
   @param dt - Delay between this and the previous update tick.
@@ -240,7 +258,11 @@ function sip.setPreviewIcon(widgets, item)
 
       elseif cfg.config.orientations then
         local path = nil
-        local img = cfg.config.orientations[1].image or cfg.config.orientations[1].dualImage or cfg.config.orientations[1].dualImage or cfg.config.orientations[1].leftImage or cfg.config.orientations[1].rightImage or (cfg.config.orientations[1].imageLayers and (cfg.config.orientations[1].imageLayers[1].image or cfg.config.orientations[1].imageLayers[1].dualImage))
+        local img = type(cfg.config.orientations[1].image) == "string" and cfg.config.orientations[1].image or
+        type(cfg.config.orientations[1].dualImage) == "string" and cfg.config.orientations[1].dualImage or
+        type(cfg.config.orientations[1].leftImage) == "string" and cfg.config.orientations[1].leftImage or
+        type(cfg.config.orientations[1].rightImage) == "string" and cfg.config.orientations[1].rightImage or
+        (cfg.config.orientations[1].imageLayers and (cfg.config.orientations[1].imageLayers[1].image or cfg.config.orientations[1].imageLayers[1].dualImage))
 
         img = img:match(".-%.png")
         if img and img ~= "" then

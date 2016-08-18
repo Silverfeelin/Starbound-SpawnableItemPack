@@ -15,6 +15,7 @@
   "customItemMissing" : "SIP: Spawnable Item Pack did not load custom items, as the '%s' item could not be found.",
   
   "itemsAdded" : "SIP: Done adding %s items to the list!",
+  "modAdded" : "SIP: Added items from '/sipMods/%s'.",
   "previewMissing" : "SIP: Item %s using inventory icon for preview, as no other icon could be found.",
   "imageError" : "SIP: Item found with unresolved preview image.",
   "filterCategoryError" : "SIP: Attempted to filter by an invalid category / invalid categories.",

@@ -13,8 +13,15 @@ namespace SpawnableItemFetcher
         /// <param name="file">File information for the found file.</param>
         delegate void FileCallback(FileInfo file);
 
+        enum ResultType {
+            Normal,
+            Patch
+        };
+
         static JArray result;
         static string basePath;
+
+        static ResultType resultType = ResultType.Patch;
 
         /// <summary>
         /// File extensions for all items.
@@ -30,7 +37,7 @@ namespace SpawnableItemFetcher
 
         static void Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length < 2 || args.Length > 3)
                 WaitAndClose("Improper usage. Expected:" +
                     "\nSpawnableItemFetcher.exe <asset_path> <output_file>" +
                     "\n<asset_path>: Absolute path to unpacked assets." +
@@ -39,6 +46,9 @@ namespace SpawnableItemFetcher
 
             basePath = args[0];
             string outputFile = args[1];
+
+            if (args.Length > 2)
+                resultType = ResultType.Normal;
 
             if (basePath.LastIndexOf("\\") == basePath.Length - 1)
                 basePath = basePath.Substring(0, basePath.Length - 1);
@@ -72,7 +82,8 @@ namespace SpawnableItemFetcher
             ScanDirectories(basePath, extensions, fc);
 
             // Write results to selected file.
-            File.WriteAllText(outputFile, result.ToString(Newtonsoft.Json.Formatting.Indented));
+            Newtonsoft.Json.Formatting format = resultType == ResultType.Patch ? Newtonsoft.Json.Formatting.Indented : Newtonsoft.Json.Formatting.None;
+            File.WriteAllText(outputFile, result.ToString(format));
 
             Console.WriteLine("Done fetching items!\nPress any key to exit...");
             Console.ReadKey();
@@ -195,9 +206,18 @@ namespace SpawnableItemFetcher
             }
 
             // Add the item.
-            JObject patch = JObject.Parse("{'op':'add','path':'/-','value':{}}");
-            patch["value"] = newItem;
-            result.Add(patch);
+            switch (resultType)
+            {
+                case ResultType.Patch:
+                    JObject patch = JObject.Parse("{'op':'add','path':'/-','value':{}}");
+                    patch["value"] = newItem;
+                    result.Add(patch);
+                    break;
+                case ResultType.Normal:
+                    result.Add(newItem);
+                    break;
+            }
+            
         }
 
         /// <summary>
