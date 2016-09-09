@@ -1178,7 +1178,10 @@
               ],
               "data": [
                 "tools",
-                "tool"
+                "tool",
+                "fishingrod",
+                "fishinglure",
+                "fishingreel"
               ]
             },
             {
