@@ -6,7 +6,7 @@
   "name" : "SpawnableItemPack",
   "priority" : -1,
   "requires" : ["Manipulated UI"],
-  "version" : "1.1.0",
+  "version" : "1.2.0",
   "link" : "steam://url/CommunityFilePage/733665104",
   "steamContentId" : "733665104"
 }
