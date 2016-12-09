@@ -1,6 +1,8 @@
 spawnableItemPack = {}
 sip = spawnableItemPack
 
+sip.lines = root.assetJson("/interface/sip/lines.json")
+
 --[[
   Reference list for image paths to inventory icon rarity borders.
 ]]
@@ -34,7 +36,7 @@ sip.widgets = {
   itemImage3 = "sipImageSelection3"
 }
 
-sip.descriptionMissing = "No description could be found for this item."
+sip.descriptionMissing = sip.lines.descriptionMissing
 
 --------------------------
 -- Engine/MUI Callbacks --
@@ -45,7 +47,7 @@ sip.descriptionMissing = "No description could be found for this item."
   This function is called every time SIP is opened from the MUI Main Menu.
 ]]
 function sip.init()
-  mui.setTitle("^shadow;Spawnable Item Pack", "^shadow;Spawn anything, for free!")
+  mui.setTitle("^shadow;" .. sip.lines.title, "^shadow;" .. sip.lines.subtitle)
   mui.setIcon("/interface/sip/icon.png")
 
   sip.gender = player.gender()
@@ -63,12 +65,12 @@ function sip.init()
     sip.customItems = nil
   else
     if not sip.customItems[1].name then
-      sb.logError("Spawnable Item pack did not load custom items, as a custom item was found with no 'name' set.")
+      sb.logError(sip.lines.customItemNameMissing)
       sip.customItems = nil
     elseif not pcall(function()
       root.itemConfig(sip.customItems[1].name)
     end) then
-      sb.logError("Spawnable Item Pack did not load custom items, as the '%s' item could not be found.", sip.customItems[1].name)
+      sb.logError(sip.lines.customItemMissing, sip.customItems[1].name)
       sip.customItems = nil
     else
       for k,v in ipairs(sip.customItems) do
@@ -76,6 +78,8 @@ function sip.init()
       end
     end
   end
+  
+  sip.loadModItems(sip.items)
   
   sip.categories = nil
   sip.changingCategory = false
@@ -106,6 +110,22 @@ function sip.init()
   --logENV()
 end
 
+function sip.loadModItems(itemList)
+  itemList = itemList or {}
+  for _,modFile in ipairs(root.assetJson("/sipMods/load.config")) do
+    local items = root.assetJson("/sipMods/" .. modFile)
+    if #items > 0 then
+      if pcall(function() root.itemConfig(items[1].name) end) then
+        for i,v in ipairs(items) do
+          table.insert(itemList, v)
+        end
+      sb.logInfo(sip.lines.modAdded, modFile)
+      end
+    end
+  end
+  
+  return itemList
+end
 --[[
   Update function, called every game tick by MUI while the interface is opened.
   @param dt - Delay between this and the previous update tick.
@@ -144,7 +164,7 @@ function sip.showItems(category)
   widget.clearListItems(sip.widgets.itemList)
 
   if type(category) == "boolean" and category == false then sip.categories = nil
-  elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error("SIP: Attempted to search for invalid category.")
+  elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error(sip.lines.categoryInvalid)
   elseif type(category) ~= "nil" then sip.categories = category end
 
   local items = sip.items
@@ -160,7 +180,7 @@ function sip.showItems(category)
     sip.setInventoryIcon({sip.widgets.itemList .. "." .. li .. ".itemIcon", sip.widgets.itemList .. "." .. li .. ".itemIcon2", sip.widgets.itemList .. "." .. li .. ".itemIcon3"}, v)
   end
 
-  sb.logInfo("SIP: Done adding " .. #items .. " items to the list!")
+  sb.logInfo(sip.lines.itemsAdded,  #items)
 end
 
 function sip.setInventoryIcon(widgets, item)
@@ -238,7 +258,11 @@ function sip.setPreviewIcon(widgets, item)
 
       elseif cfg.config.orientations then
         local path = nil
-        local img = cfg.config.orientations[1].image or cfg.config.orientations[1].dualImage or cfg.config.orientations[1].dualImage or cfg.config.orientations[1].leftImage or cfg.config.orientations[1].rightImage or (cfg.config.orientations[1].imageLayers and (cfg.config.orientations[1].imageLayers[1].image or cfg.config.orientations[1].imageLayers[1].dualImage))
+        local img = type(cfg.config.orientations[1].image) == "string" and cfg.config.orientations[1].image or
+        type(cfg.config.orientations[1].dualImage) == "string" and cfg.config.orientations[1].dualImage or
+        type(cfg.config.orientations[1].leftImage) == "string" and cfg.config.orientations[1].leftImage or
+        type(cfg.config.orientations[1].rightImage) == "string" and cfg.config.orientations[1].rightImage or
+        (cfg.config.orientations[1].imageLayers and (cfg.config.orientations[1].imageLayers[1].image or cfg.config.orientations[1].imageLayers[1].dualImage))
 
         img = img:match(".-%.png")
         if img and img ~= "" then
@@ -253,9 +277,9 @@ function sip.setPreviewIcon(widgets, item)
         sip.setDrawableIcon(widgets[1], item.path, cfg.config.image, item.directives)
       elseif cfg.config.inventoryIcon then
         sip.setInventoryIcon(widgets, item)
-        sb.logInfo("SIP: Item %s using inventory icon for preview, as no other icon could be found.", item)
+        sb.logInfo(sip.lines.previewMissing, item)
       else
-        error("Item found with unresolved preview image.")
+        error(sip.lines.imageError)
       end
     end
   end
@@ -266,8 +290,8 @@ function sip.clearPreview()
   for _,v in ipairs(widgets) do
     widget.setImage(v, "/assetMissing.png")
   end
-  widget.setText(sip.widgets.itemDescription, "Please select an item to view it's details.")
-  widget.setText(sip.widgets.itemName, "No item selected.")
+  widget.setText(sip.widgets.itemDescription, sip.lines.itemDetails)
+  widget.setText(sip.widgets.itemName, sip.lines.noSelection)
   widget.setImage(sip.widgets.itemRarity, sip.rarities["commonFlag"])
   sip.showDummy(false)
 end
@@ -305,7 +329,7 @@ function sip.filterByCategory(list, categories)
   if categories == nil then return list end
   if type(categories) == "string" then categories = { [categories] = true }
   elseif type(categories) == "table" then categories = Set(categories)
-  else error("SIP: Attempted to filter by an invalid category / invalid categories.") end
+  else error(sip.lines.filterCategoryError) end
 
   local results = {}
   for _,v in pairs(list) do
@@ -324,7 +348,7 @@ end
   @param text - Text to filter by.
 ]]
 function sip.filterByText(list, text)
-  if type(text) ~= "string" then error("SIP: Attempted to filter by invalid text.") end
+  if type(text) ~= "string" then error(sip.lines.filterTextError) end
   if text == "" then return list end
 
   text = text:lower()
@@ -379,7 +403,7 @@ function sip.spawnItem(itemName, quantity)
       end
     end
   end) then
-    sb.logError("Spawnable Item Pack could not spawn the item '%s', as it does not appear to exist.", itemName)
+    sb.logError(sip.lines.spawnItemMissing, itemName)
     return
   end
   
@@ -435,7 +459,7 @@ end
   @return - Quantity of item to print.
 ]]
 function sip.getQuantity()
-  if type(sip.quantity) ~= "number" then error("SIP: Quantity is stored incorrectly. Please contact the mod author.") end
+  if type(sip.quantity) ~= "number" then error(sip.lines.quantityInvalid) end
   return sip.quantity
 end
 
@@ -445,7 +469,7 @@ end
   @param amnt - New quantity. Should be an integer.
 ]]
 function sip.setQuantity(amnt)
-  if type(amnt) ~= "number" then error("SIP: Attempted to set quantity to an invalid number. Please contact the mod author.") end
+  if type(amnt) ~= "number" then error(sip.lines.setQuantityInvalid) end
   sip.quantity = math.clamp(amnt, 0, 9999)
 
   widget.setText(sip.widgets.quantity, "x" .. sip.getQuantity())
@@ -456,7 +480,7 @@ end
   @param amnt - Amount to adjust the quantity with. Can be positive and negative. Should be an integer.
 ]]
 function sip.adjustQuantity(amnt)
-  if type(amnt) ~= "number" then error("SIP: Attempted to adjust quantity by an invalid number. Please contact the mod author.") end
+  if type(amnt) ~= "number" then error(sip.lines.adjustQuantityInvalid) end
   sip.setQuantity(sip.getQuantity() + amnt)
 end
 
@@ -474,7 +498,7 @@ function sip.getItemConfig(itemName)
   end) then
     return cfg
   else
-    sb.logError("SIP: Item configuration could not be loaded! Please report the following line to the mod author.\n%s", item)
+    sb.logError(sip.lines.itemConfigurationMissing, itemName)
     return nil
   end
 end
@@ -604,12 +628,12 @@ end
   @param t - Widget data representing the type to show. Should be items or objects
 ]]
 function sip.showType(_, t)
-  if type(t) ~= "string" then error("SIP: Attempted to run sip.showType with a value other than a string.") end
+  if type(t) ~= "string" then error(sip.lines.showTypeInvalid) end
   local cats = {
     objects = { "materials", "liqitem", "supports", "railpoint", "decorative", "actionfigure", "artifact", "breakable", "bug", "crafting", "spawner", "door", "light", "storage", "furniture", "trap", "wire", "sapling", "seed", "other", "generic", "teleportmarker" },
     items = { "headwear", "chestwear", "legwear", "backwear", "headarmour", "chestarmour", "legarmour", "enviroprotectionpack", "broadsword", "fistweapon", "chakram", "axe", "dagger", "hammer", "spear", "shortsword", "whip", "melee", "ranged", "sniperrifle", "boomerang", "bow", "shotgun", "assaultrifle", "machinepistol", "rocketlauncher", "pistol", "grenadelauncher", "staff", "wand", "throwableitem", "shield", "vehiclecontroller", "railplatform", "upgrade", "shiplicense", "mysteriousreward", "toy", "clothingdye", "medicine", "drink", "food", "preparedfood", "craftingmaterial", "cookingingredient", "upgradecomponent", "smallfossil", "mediumfossil", "largefossil", "codex", "quest", "junk", "currency", "trophy", "tradingcard", "eppaugment", "petcollar", "musicalinstrument", "tool" }
   }
-  if not cats[t] then sb.logError("SIP: Could now show items for the type '" .. t .. "'") return end
+  if not cats[t] then sb.logError(sip.lines.showTypeFailed, t) return end
   sip.showItems(cats[t])
 
   widget.setSelectedOption("sipCategoryScroll.sipCategoryGroup", -1)
