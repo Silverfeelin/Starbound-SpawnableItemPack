@@ -630,7 +630,7 @@ end
 function sip.showType(_, t)
   if type(t) ~= "string" then error(sip.lines.showTypeInvalid) end
   local cats = {
-    objects = { "materials", "liqitem", "supports", "railpoint", "decorative", "actionfigure", "artifact", "breakable", "bug", "crafting", "spawner", "door", "light", "storage", "furniture", "trap", "wire", "sapling", "seed", "other", "generic", "teleportmarker" },
+    objects = { "object", ".object", "genboss", "terraformer", "materials", "liqitem", "supports", "railpoint", "decorative", "actionfigure", "artifact", "breakable", "bug", "crafting", "spawner", "door", "light", "storage", "furniture", "trap", "wire", "sapling", "seed", "other", "generic", "teleportmarker" },
     items = { "headwear", "chestwear", "legwear", "backwear", "headarmour", "chestarmour", "legarmour", "enviroprotectionpack", "broadsword", "fistweapon", "chakram", "axe", "dagger", "hammer", "spear", "shortsword", "whip", "melee", "ranged", "sniperrifle", "boomerang", "bow", "shotgun", "assaultrifle", "machinepistol", "rocketlauncher", "pistol", "grenadelauncher", "staff", "wand", "throwableitem", "shield", "vehiclecontroller", "railplatform", "upgrade", "shiplicense", "mysteriousreward", "toy", "clothingdye", "medicine", "drink", "food", "preparedfood", "craftingmaterial", "cookingingredient", "upgradecomponent", "smallfossil", "mediumfossil", "largefossil", "codex", "quest", "junk", "currency", "trophy", "tradingcard", "eppaugment", "petcollar", "musicalinstrument", "tool" }
   }
   if not cats[t] then sb.logError(sip.lines.showTypeFailed, t) return end

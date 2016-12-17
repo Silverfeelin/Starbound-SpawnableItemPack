@@ -1495,6 +1495,21 @@
                 -372
               ],
               "data": "liquid"
+            },
+            {
+              "baseImage": "/interface/sip/categories/terraformer.png",
+              "hoverImage": "/interface/sip/categories/terraformer.png?brightness=30",
+              "baseImageChecked": "/interface/sip/categories/terraformerselected.png",
+              "hoverImageChecked": "/interface/sip/categories/terraformerselected.png?brightness=30",
+              "pressedOffset": [
+                0,
+                -1
+              ],
+              "position": [
+                75,
+                -372
+              ],
+              "data": "terraformer"
             }
           ]
         },
@@ -1804,7 +1819,7 @@
       "settingsEnabled": true,
       "settingControls": [
         "sipLabelSettingsReturn",
-        "sipSettingsScroll"        
+        "sipSettingsScroll"
       ],
       "update": {
         "bgb": "/interface/sip/body.png",
