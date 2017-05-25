@@ -26,7 +26,7 @@ namespace SpawnableItemFetcher
         /// <summary>
         /// File extensions for all items.
         /// </summary>
-        static string[] extensions = ".activeitem,.object,.codex,.head,.chest,.legs,.back,.augment,.coinitem,.item,.consumable,.unlock,.instrument,.liqitem,.matitem,.thrownitem,.harvestingtool,.flashlight,.grapplinghook,.painttool,.wiretool,.beamaxe,.tillingtool,.miningtool,.techitem".Split(',');
+        static string[] extensions = ".activeitem,.object,.codex,.head,.chest,.legs,.back,.augment,.currency,.coinitem,.item,.consumable,.unlock,.instrument,.liqitem,.matitem,.thrownitem,.harvestingtool,.flashlight,.grapplinghook,.painttool,.wiretool,.beamaxe,.tillingtool,.miningtool,.techitem".Split(',');
 
         // Item names to exclude from the list.
         static string[] ignoredItems = new string[]
