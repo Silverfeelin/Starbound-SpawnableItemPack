@@ -576,6 +576,22 @@
   },
   {
     "op": "add",
+    "path": "/gui/sipImageSelectionIconSlot",
+    "value": {
+      "type": "itemslot",
+      "file": "/assetMissing.png",
+      "position": [
+        312,
+        161
+      ],
+      "zlevel": 22,
+      "visible": true,
+      "centered": false,
+      "callback": "null"
+    }
+  },
+  {
+    "op": "add",
     "path": "/gui/sipImageSelection",
     "value": {
       "type": "image",
@@ -1182,6 +1198,23 @@
                 "fishingrod",
                 "fishinglure",
                 "fishingreel"
+              ]
+            },
+            {
+              "baseImage": "/interface/sip/categories/mech.png",
+              "hoverImage": "/interface/sip/categories/mech.png?brightness=30",
+              "baseImageChecked": "/interface/sip/categories/mechselected.png",
+              "hoverImageChecked": "/interface/sip/categories/mechselected.png?brightness=30",
+              "pressedOffset": [
+                0,
+                -1
+              ],
+              "position": [
+                38,
+                -231
+              ],
+              "data": [
+                "mechpart"
               ]
             },
             {
@@ -1807,9 +1840,7 @@
         "sipImageSelection",
         "sipImageSelection2",
         "sipImageSelection3",
-        "sipImageSelectionIcon",
-        "sipImageSelectionIcon2",
-        "sipImageSelectionIcon3",
+        "sipImageSelectionIconSlot",
         "sipImageSelectionRarity",
         "sipLabelSelectionName",
         "sipLabelSelectionDescription",
