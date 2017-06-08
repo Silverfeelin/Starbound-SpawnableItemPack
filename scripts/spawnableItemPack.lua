@@ -33,7 +33,8 @@ sip.widgets = {
   itemRarity = "sipImageSelectionRarity",
   itemImage = "sipImageSelection",
   itemImage2 = "sipImageSelection2",
-  itemImage3 = "sipImageSelection3"
+  itemImage3 = "sipImageSelection3",
+  itemSlot = "sipImageSelectionIconSlot"
 }
 
 sip.descriptionMissing = sip.lines.descriptionMissing
@@ -58,7 +59,7 @@ function sip.init()
 
   sip.items = root.assetJson("/sipItemDump.json")
   sip.customItems = root.assetJson("/sipCustomItems.json")
-  
+
   -- Simple check for the first custom item to exist. Will obviously not catch all missing items.
   -- If the first custom item does not exist, do not load /any/ custom items.
   if #sip.customItems == 0 then
@@ -78,9 +79,9 @@ function sip.init()
       end
     end
   end
-  
+
   sip.loadModItems(sip.items)
-  
+
   sip.categories = nil
   sip.changingCategory = false
   sip.showCategories(false)
@@ -92,7 +93,7 @@ function sip.init()
   sip.previousSearch = ""
   sip.filter()
   sip.changeQuantity()
-  
+
   local category, categoryData = sip.getSelectedCategory()
   if category then
     widget.setSize("sipCategoryIndex", {0,0})
@@ -106,7 +107,7 @@ function sip.init()
   if weaponLevel then
     sip.weaponLevel = weaponLevel
   end
-  
+
   --logENV()
 end
 
@@ -123,7 +124,7 @@ function sip.loadModItems(itemList)
       end
     end
   end
-  
+
   return itemList
 end
 --[[
@@ -184,6 +185,15 @@ function sip.showItems(category)
 end
 
 function sip.setInventoryIcon(widgets, item)
+  if type(widgets) == "string" then
+    if type(item) == "string" then
+      widget.setItemSlotItem(widgets, {name=item})
+    else
+      widget.setItemSlotItem(widgets, item)
+    end
+    return
+  end
+
   local directives = item.directives or ""
 
   if type(item.icon) == "string" and item.icon ~= "null" then
@@ -286,7 +296,8 @@ function sip.setPreviewIcon(widgets, item)
 end
 
 function sip.clearPreview()
-  local widgets = {"sipImageSelectionIcon", "sipImageSelectionIcon2", "sipImageSelectionIcon3", "sipImageSelection", "sipImageSelection2", "sipImageSelection3"}
+  widget.setItemSlotItem(sip.widgets.itemSlot, nil);
+  local widgets = {"sipImageSelection", "sipImageSelection2", "sipImageSelection3"}
   for _,v in ipairs(widgets) do
     widget.setImage(v, "/assetMissing.png")
   end
@@ -386,7 +397,7 @@ function sip.spawnItem(itemName, quantity)
   local weaponLevel = nil
   if not pcall(function()
     local cfg = root.itemConfig(itemName)
-    
+
     if cfg.config then
       if cfg.config.level then
         weaponLevel = sip.weaponLevel
@@ -406,10 +417,10 @@ function sip.spawnItem(itemName, quantity)
     sb.logError(sip.lines.spawnItemMissing, itemName)
     return
   end
-  
+
   local params = nil
   if weaponLevel then params = { level = weaponLevel } end
-  
+
   local it, rest = math.floor(quantity / 1000), quantity % 1000
   for i=1,it do
     player.giveItem({name=itemName, count=1000, parameters = params })
@@ -568,7 +579,7 @@ function sip.itemSelected()
 
   local directives = item.directives or ""
 
-  sip.setInventoryIcon({"sipImageSelectionIcon", "sipImageSelectionIcon2", "sipImageSelectionIcon3"}, item)
+  sip.setInventoryIcon(sip.widgets.itemSlot, item)
   sip.setPreviewIcon({"sipImageSelection", "sipImageSelection2", "sipImageSelection3"}, item)
 end
 
@@ -601,7 +612,7 @@ function sip.changeWeaponLevel(_, data)
       level = n
     else return end
   end
-  
+
   sip.weaponLevel = math.clamp(level, 1, 10)
   widget.setText("sipSettingsScroll.weaponLevel", tostring(sip.weaponLevel))
 end
