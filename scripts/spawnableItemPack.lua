@@ -726,14 +726,3 @@ function Set (list)
   for _, l in ipairs(list) do set[l] = true end
   return set
 end
-
--- Thanks to Magicks
-function player.id()
-  local id = nil
-  pcall(function()
-    local uid = player.ownShipWorldId():match":(.+)"
-    local pos =  world.findUniqueEntity(uid):result()
-    id = world.entityQuery(pos,3,{order = "nearest",includedTypes = {"player"}})[1]
-  end)
-  return id
-end
