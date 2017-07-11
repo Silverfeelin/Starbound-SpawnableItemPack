@@ -1,31 +1,20 @@
 {
   // The '%s' symbols should never be added or removed.
-  
+
   "author" : "Silverfeelin",
   "title" : "Spawnable Item Pack",
   "subtitle" : "Spawn anything, for free!",
-  
+
+  "viewCategories": "View\nCategories",
+  "showItems": "Show All\nItems",
+  "showObjects": "Show All\nObjects",
+
   "descriptionMissing" : "No description could be found for this item.",
   "itemDetails" : "Please select an item to view it's details.",
   "noSelection" : "No item selected.",
-  
-  // The below lines are only logged to the starbound.log file.
-  
-  "customItemNameMissing" : "SIP: Spawnable Item Pack did not load custom items, as a custom item was found with no 'name' set.",
-  "customItemMissing" : "SIP: Spawnable Item Pack did not load custom items, as the '%s' item could not be found.",
-  
-  "itemsAdded" : "SIP: Done adding %s items to the list!",
-  "modAdded" : "SIP: Added items from '/sipMods/%s'.",
-  "previewMissing" : "SIP: Item %s using inventory icon for preview, as no other icon could be found.",
-  "imageError" : "SIP: Item found with unresolved preview image.",
-  "filterCategoryError" : "SIP: Attempted to filter by an invalid category / invalid categories.",
-  "filterTextError" : "SIP: Attempted to filter by invalid text.",
-  "categoryInvalid" : "SIP: Attempted to search for invalid category.",
-  "spawnItemMissing" : "SIP: Spawnable Item Pack could not spawn the item '%s', as it does not appear to exist.",
-  "quantityInvalid" : "SIP: Quantity is stored incorrectly. Please contact the mod author.",
-  "setQuantityInvalid" : "SIP: Attempted to set quantity to an invalid number. Please contact the mod author.",
-  "adjustQuantityInvalid" : "SIP: Attempted to adjust quantity by an invalid number. Please contact the mod author.",
-  "itemConfigurationMissing" : "SIP: Item configuration could not be loaded! Please report this to the mod author.\n%s",
-  "showTypeInvalid" : "SIP: Attempted to run sip.showType with a value other than a string.",
-  "showTypeFailed" : "SIP: Could now show items for the type '%s'"
+
+  "specifications": "Specifications",
+  "level" : "Level",
+  "element" : "Element",
+  "color" : "Color"
 }
