@@ -242,6 +242,7 @@ function sip.spawnItem(itemConfig, quantity)
   if itemConfig.maxStack == 1 then quantity = 1 end
 
   local item = widget.itemSlotItem(sip.widgets.itemSlot)
+  item.count = quantity
 
   local it, rest = math.floor(quantity / 1000), quantity % 1000
   for i=1,it do
@@ -272,15 +273,15 @@ function sip.getSpawnItemParameters(itemConfig)
   return params
 end
 
---[[
-  Returns the currently selected item, if any.
-  @return - Item data, as stored in the item dump.
-]]
+--- Gets the currently selected item from the list.
+-- If no item is selected in the list, the current item is returned.
+-- @return - Item data, as stored in the item dump.
+-- @see sip.widgets.itemList, sip.item
 function sip.getSelectedItem()
   local li = widget.getListSelected(sip.widgets.itemList)
-  if not li then return nil end
+  if not li then return sip.item end
   local item = widget.getData(sip.widgets.itemList .. "." .. li)
-  return item
+  return item or sip.item
 end
 
 --[[
@@ -374,6 +375,7 @@ end
 -- Shows option containers based on item type (weapon, clothing).
 function sip.selectItem()
   sip.item = sip.getSelectedItem()
+
   local config
   if sip.item then config = sip_util.itemConfig(sip.item.name).config else return end
 
@@ -538,7 +540,6 @@ end
 function sip.selectClothingColor(_, data)
   if data then
     sip.colorOption = data
-    sb.logInfo("RAndomizing for clothing")
     sip.randomizeItem()
   end
 end
@@ -547,7 +548,7 @@ end
 -- If the max stack size of the item is 1, spawn 1 instead.
 -- Logs an error if this item could not be spawned, by checking if it has an item configuration.
 function sip.print()
-  local item, q = sip.getSelectedItem(), sip.getQuantity()
+  local item, q = sip.item, sip.getQuantity()
   if not item or not item.name then return end
 
   local cfg = sip_util.itemConfig(item.name)
