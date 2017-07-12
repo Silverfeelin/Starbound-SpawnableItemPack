@@ -40,6 +40,13 @@ namespace SpawnableItemFetcher
 
         static void Main(string[] args)
         {
+            WriteColoredLine(ConsoleColor.White, "= Spawnable Item Fetcher");
+
+            if (args.Length == 0)
+            {
+                args = PromptArgs();
+            }
+
             if (args.Length != 2)
                 WaitAndClose("Improper usage. Expected:" +
                     "\nSpawnableItemFetcher.exe <asset_path> <output_file>" +
@@ -105,9 +112,40 @@ namespace SpawnableItemFetcher
 
             // Write results to selected file.
             Newtonsoft.Json.Formatting format = Newtonsoft.Json.Formatting.None;
+
+            Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
             File.WriteAllText(outputFile, result.ToString(format));
 
             WaitAndClose("Done fetching items!");
+        }
+
+        static string[] PromptArgs()
+        {
+            string[] args = new string[2];
+
+            WriteColoredLine(ConsoleColor.Cyan, "What asset directory would you like to scan?");
+            while (true)
+            {
+                string path = Console.ReadLine();
+
+                if (Directory.Exists(path))
+                {
+                    args[0] = path;
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("That directory does not exist. Please enter a valid directory.");
+                }
+
+            }
+
+            WriteColoredLine(ConsoleColor.Cyan, "Where would you like to save the result to?");
+            args[1] = Console.ReadLine();
+
+            Console.WriteLine();
+
+            return args;
         }
 
         /// <summary>
@@ -418,9 +456,25 @@ namespace SpawnableItemFetcher
             Console.ResetColor();
         }
 
+        static void WriteColored(ConsoleColor color, ConsoleColor backColor, string str, params object[] args)
+        {
+            Console.ForegroundColor = color;
+            Console.BackgroundColor = backColor;
+            Console.Write(str, args);
+            Console.ResetColor();
+        }
+
         static void WriteColoredLine(ConsoleColor color, string str, params object[] args)
         {
             Console.ForegroundColor = color;
+            Console.WriteLine(str, args);
+            Console.ResetColor();
+        }
+
+        static void WriteColoredLine(ConsoleColor color, ConsoleColor backColor, string str, params object[] args)
+        {
+            Console.ForegroundColor = color;
+            Console.BackgroundColor = backColor;
             Console.WriteLine(str, args);
             Console.ResetColor();
         }
