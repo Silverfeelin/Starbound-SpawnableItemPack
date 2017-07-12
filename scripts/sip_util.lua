@@ -1,24 +1,5 @@
 sip_util = {}
 
---[[
-  Returns the game's item configuration for the given item, handling errors when an invalid item is given.
-  Note that details are generally stored in returnValue.config. The parameter returnValue.parameters
-  may also contain useful data.
-  @param itemName - Item identifier used to spawn the item with (usually itemName or objectName).
-  @return - Item configuration as root.itemConfig returns it, or nil if the item configuration could not be found.
-]]
-function sip_util.itemConfig(itemName)
-  local cfg
-  if pcall(function()
-    cfg = root.itemConfig(itemName)
-  end) then
-    return cfg
-  else
-    sb.logError(sip.lines.itemConfigurationMissing, itemName)
-    return nil
-  end
-end
-
 function sip_util.isColorable(itemConfig)
   if itemConfig then
     return not not itemConfig.colorOptions

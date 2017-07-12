@@ -7,13 +7,16 @@ namespace SpawnableItemFetcher
 {
     class Program
     {
+        static readonly string LINK_HELP = "https://github.com/Silverfeelin/Starbound-SpawnableItemPack/wiki/Adding-Items";
+
         /// <summary>
         /// File callback for <see cref="ScanDirectory(DirectoryInfo, bool, FileCallback)"/>
         /// </summary>
         /// <param name="file">File information for the found file.</param>
         delegate void FileCallback(FileInfo file);
 
-        enum ResultType {
+        enum ResultType
+        {
             Normal,
             Patch
         };
@@ -26,7 +29,7 @@ namespace SpawnableItemFetcher
         /// <summary>
         /// File extensions for all items.
         /// </summary>
-        static string[] extensions = ".activeitem,.object,.codex,.head,.chest,.legs,.back,.augment,.currency,.coinitem,.item,.consumable,.unlock,.instrument,.liqitem,.matitem,.thrownitem,.harvestingtool,.flashlight,.grapplinghook,.painttool,.wiretool,.beamaxe,.tillingtool,.miningtool,.techitem".Split(',');
+        static string[] extensions = ".activeitem,.object,.codex,.head,.chest,.legs,.back,.augment,.currency,.coinitem,.item,.consumable,.unlock,.instrument,.liqitem,.matitem,.thrownitem,.harvestingtool,.flashlight,.grapplinghook,.painttool,.wiretool,.beamaxe,.tillingtool,.miningtool,.techitem,.mechitem".Split(',');
 
         // Item names to exclude from the list.
         static string[] ignoredItems = new string[]
@@ -37,43 +40,62 @@ namespace SpawnableItemFetcher
 
         static void Main(string[] args)
         {
-            if (args.Length < 2 || args.Length > 3)
+            if (args.Length != 2)
                 WaitAndClose("Improper usage. Expected:" +
                     "\nSpawnableItemFetcher.exe <asset_path> <output_file>" +
                     "\n<asset_path>: Absolute path to unpacked assets." +
-                    "\n<output_file>: Absolute path to file to write results to." +
-                    "\nOutput file should be /yourMod/sipCustomItems.json.patch");
+                    "\n<output_file>: Absolute path to file to write results to.");
 
             basePath = args[0];
             string outputFile = args[1];
 
-            if (args.Length > 2)
-                resultType = ResultType.Normal;
-
             if (basePath.LastIndexOf("\\") == basePath.Length - 1)
                 basePath = basePath.Substring(0, basePath.Length - 1);
 
+            // Show paths
+            Console.Write("Asset Path:  ");
+            WriteColoredLine(ConsoleColor.Cyan, basePath);
+            Console.Write("Output File: ");
+            WriteColoredLine(ConsoleColor.Cyan, outputFile);
+            Console.WriteLine();
+
             // Confirm asset path
             if (!Directory.Exists(basePath))
-                WaitAndClose("Asset directory '" + basePath + "' not found. Invalid directory given.");
+                WaitAndClose("Asset directory '" + basePath + "' not found.");
 
             // Confirm overwriting
             if (File.Exists(outputFile))
             {
-                Console.WriteLine("Output file '" + outputFile + "' already exists!\n1. Overwrite file\n2. Cancel");
+                Console.WriteLine("Overwrite existing output file?");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("[1] Overwrite file. [2] Cancel.");
+                Console.ResetColor();
 
                 ConsoleKeyInfo cki = Console.ReadKey(true);
                 switch (cki.Key)
                 {
                     default:
-                        WaitAndClose("Cancelling task.");
+                        WaitAndClose("Cancelled.");
                         break;
                     case ConsoleKey.D1:
                     case ConsoleKey.NumPad1:
-                        Console.WriteLine("Output file will be overwritten.");
+                        Console.WriteLine("The file will be overwritten.");
                         break;
                 }
+                Console.WriteLine();
             }
+
+            // Get result type.
+            resultType = PromptResultType();
+
+            if (resultType == ResultType.Patch && !outputFile.EndsWith(".patch"))
+            {
+                Console.WriteLine("You're trying to make a patch file, but the output file does not end with '.patch'!");
+            }
+            Console.WriteLine();
+
+            // Start scan
+            Console.WriteLine("Starting to scan assets. This can take a while...");
 
             result = new JArray();
             FileCallback fc = new FileCallback(AddItem);
@@ -82,11 +104,57 @@ namespace SpawnableItemFetcher
             ScanDirectories(basePath, extensions, fc);
 
             // Write results to selected file.
-            Newtonsoft.Json.Formatting format = resultType == ResultType.Patch ? Newtonsoft.Json.Formatting.Indented : Newtonsoft.Json.Formatting.None;
+            Newtonsoft.Json.Formatting format = Newtonsoft.Json.Formatting.None;
             File.WriteAllText(outputFile, result.ToString(format));
 
-            Console.WriteLine("Done fetching items!\nPress any key to exit...");
-            Console.ReadKey();
+            WaitAndClose("Done fetching items!");
+        }
+
+        /// <summary>
+        /// Prompts the user to select a <see cref="ResultType"/>.
+        /// This can not be interrupted, unless closing the application.
+        /// </summary>
+        /// <returns>Selected result type.</returns>
+        static ResultType PromptResultType()
+        {
+            Console.WriteLine("Make a mod item file or patch file?");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("[1] Mod File. [2] Patch File. [3] Unsure.");
+            Console.ResetColor();
+
+            ResultType resultType = ResultType.Normal;
+
+            bool breakModeLoop;
+            do
+            {
+                breakModeLoop = true;
+                var cki = Console.ReadKey(true);
+                switch (cki.Key)
+                {
+                    default:
+                        breakModeLoop = false;
+                        break;
+                    case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
+                        Console.WriteLine("Mod file it is.");
+                        resultType = ResultType.Normal;
+                        break;
+                    case ConsoleKey.D2:
+                    case ConsoleKey.NumPad2:
+                        Console.WriteLine("Patch file it is.");
+                        resultType = ResultType.Patch;
+                        break;
+                    case ConsoleKey.D3:
+                    case ConsoleKey.NumPad3:
+                        WriteColoredLine(ConsoleColor.DarkCyan, "Info: " + LINK_HELP);
+                        System.Diagnostics.Process.Start(LINK_HELP);
+                        breakModeLoop = false;
+                        break;
+
+                }
+            } while (!breakModeLoop);
+
+            return resultType;
         }
 
         /// <summary>
@@ -95,115 +163,52 @@ namespace SpawnableItemFetcher
         /// <param name="file">File to scan. Expected to be a JSON formatted item file.</param>
         static void AddItem(FileInfo file)
         {
+            // Read file
             string content = File.ReadAllText(file.FullName);
+
+            // Parse file
             JObject item = null;
             try
             {
                 item = JObject.Parse(content);
             }
-            catch (Exception exc)
+            catch
             {
                 Console.WriteLine("Skipped '" + file.FullName + "', as it could not be parsed as a valid JSON file.");
+                return;
             }
 
             JObject newItem = new JObject();
 
+            newItem["path"] = AssetPath(file.FullName, basePath);
+            newItem["fileName"] = file.Name;
+
             // Set item name
-            newItem["name"] = item["itemName"];
-            if (newItem["name"] == null || newItem["name"].Type != JTokenType.String)
-                newItem["name"] = item["objectName"];
-            if (newItem["name"] == null || newItem["name"].Type != JTokenType.String || ignoredItems.Contains(newItem["name"].Value<string>().ToLower()))
+            string name = GetItemName(item);
+            newItem["name"] = name;
+
+            if (string.IsNullOrEmpty(name))
                 return;
 
             // Set item description. Use item name if no description is set.
-            newItem["shortdescription"] = item["shortdescription"];
-            if (newItem["shortdescription"] == null || newItem["shortdescription"].Type != JTokenType.String)
-                newItem["shortdescription"] = newItem["name"];
+            string shortDescription = GetItemShortDescription(item);
+            if (string.IsNullOrEmpty(shortDescription))
+                shortDescription = name;
+            newItem["shortdescription"] = shortDescription;
 
             // Set category
             string category = GetCategory(file.Extension, item);
             newItem["category"] = category;
 
-            // Base path removed to get an asset path. Slash added to the end and backslashes converted to regular slashes.
-            newItem["path"] = (Path.GetDirectoryName(file.FullName) + "/").Replace(basePath, "").Replace("\\", "/");
-
             // Set icon
-            newItem["icon"] = GetIcon(item);
-            if (newItem["icon"] == null || newItem["icon"].Type != JTokenType.String)
-                newItem["icon"] = "/assetMissing.png";
-
-            // Set filename
-            newItem["fileName"] = file.Name;
+            newItem["icon"] = GetIcon(item, true);
 
             // Set rarity. Use common if no rarity is set.
-            if (item["rarity"] != null || item["rarity"].Type != JTokenType.String)
-                newItem["rarity"] = item["rarity"].Value<String>().ToLower();
-            else
-                newItem["rarity"] = "common";
+            newItem["rarity"] = GetRarity(item);
 
-            // Attempt to use first frame as the preview image, for objects.
-            // Really messy and doesn't work most of the time.
-            if (file.Extension == ".object")
-            {
-                string n = Path.GetFileNameWithoutExtension(file.FullName);
-                string t = null;
-                if (File.Exists(file.DirectoryName + @"\" + n + ".frames"))
-                {
-                    t = File.ReadAllText(file.DirectoryName + @"\" + n + ".frames");
-                }
-                else if (File.Exists(file.DirectoryName + @"\" + n + "left.frames"))
-                {
-                    t = File.ReadAllText(file.DirectoryName + @"\" + n + "left.frames");
-                }
-                else if (File.Exists(file.DirectoryName + @"\" + "default.frames"))
-                {
-                    t = File.ReadAllText(file.DirectoryName + @"\" + "default.frames");
-                }
-                if (t != null)
-                {
-                    JObject b = JObject.Parse(t);
-                    JToken tk = b["frameGrid"]["names"];
-                    if (tk != null && tk.Count() > 0)
-                    {
-                        foreach (var frame in tk[0])
-                        {
-                            string value = frame.Value<String>();
-                            if (!string.IsNullOrEmpty(value))
-                            {
-                                newItem["frame"] = value;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Use the first color option, if color options are present.
-            // Generally used for clothes.
-            JToken colors = item.SelectToken("colorOptions");
-
-            if (colors is JArray)
-            {
-                JArray cs = (JArray)colors;
-                if (cs.Count() > 0)
-                {
-                    try
-                    {
-                        JObject color = (JObject)colors[0];
-                        string dir = "?replace";
-                        foreach (var c in color)
-                        {
-                            dir += ";" + c.Key + "=" + c.Value;
-                        }
-
-                        newItem["directives"] = dir;
-                    }
-                    catch
-                    {
-
-                    }
-                }
-            }
+            string directives = GetDirectives(item);
+            if (!string.IsNullOrEmpty(directives))
+                newItem["directives"] = directives;
 
             // Add the item.
             switch (resultType)
@@ -217,7 +222,30 @@ namespace SpawnableItemFetcher
                     result.Add(newItem);
                     break;
             }
-            
+
+        }
+
+        static string GetItemName(JObject item)
+        {
+            JToken name = item["itemName"];
+
+            if (name == null || name.Type != JTokenType.String)
+                name = item["objectName"];
+
+            if (name != null && name.Type != JTokenType.String)
+                name = null;
+
+            return name?.Value<string>();
+        }
+
+        static string GetItemShortDescription(JObject item)
+        {
+            JToken tkn = item["shortdescription"];
+
+            if (tkn != null && tkn.Type != JTokenType.String)
+                return null;
+
+            return tkn?.Value<string>();
         }
 
         /// <summary>
@@ -259,8 +287,10 @@ namespace SpawnableItemFetcher
                 else if (tags != null && tags.Values().Contains("shield"))
                     category = "shield";
                 else
-                    Console.WriteLine("Specific category for " + item["shortdescription"].Value<string>() + " could not be found. Using '" + category + "' instead.");
+                    Console.WriteLine("Category for " + item["shortdescription"].Value<string>() + " could not be determined. Using '" + category + "' instead.");
             }
+
+            // Hardcoded categorization.
             if (category == "uniqueWeapon")
             {
                 switch (item["shortdescription"].Value<string>())
@@ -283,20 +313,69 @@ namespace SpawnableItemFetcher
         /// </summary>
         /// <param name="obj">Item</param>
         /// <returns>Absolute or relative asset path, or null.</returns>
-        static JToken GetIcon(JObject obj)
+        static JToken GetIcon(JObject obj, bool useAssetMissing = true)
         {
             JToken token = obj.SelectToken("inventoryIcon");
-            if (token != null) return token;
-            token = obj.SelectToken("icon");
-            if (token != null) return token;
-            token = obj.SelectToken("renderParameters");
-            if (token != null)
+            if (token == null)
+                token = obj.SelectToken("icon");
+
+            if (token == null)
             {
-                JToken token2 = token.SelectToken("texture");
-                if (token2 != null) return token2;
+                token = obj.SelectToken("renderParameters");
+
+                if (token != null)
+                {
+                    token = token.SelectToken("texture");
+                }
+            }
+
+            if (token?.Type == JTokenType.Array)
+            {
+                token = token[0];
+            }
+
+            return token != null ? token : useAssetMissing ? "/assetMissing.png" : null;
+        }
+
+        static string GetDirectives(JObject item)
+        {
+            // Use the first color option, if color options are present.
+            // Generally used for clothes.
+            JToken colors = item.SelectToken("colorOptions");
+
+            if (colors is JArray)
+            {
+                JArray cs = (JArray)colors;
+                if (cs.Count() > 0)
+                {
+                    try
+                    {
+                        JObject color = (JObject)colors[0];
+                        string dir = "?replace";
+                        foreach (var c in color)
+                        {
+                            dir += ";" + c.Key + "=" + c.Value;
+                        }
+
+                        return dir;
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
             }
 
             return null;
+        }
+
+        static string GetRarity(JObject item, string defaultRarity = "common")
+        {
+            JToken tkn = item["rarity"];
+            if (tkn == null || tkn.Type != JTokenType.String)
+                return defaultRarity;
+
+            return tkn.Value<string>().ToLowerInvariant();
         }
 
         /// <summary>
@@ -315,6 +394,11 @@ namespace SpawnableItemFetcher
             }
         }
 
+        static string AssetPath(string filePath, string basePath)
+        {
+            return (Path.GetDirectoryName(filePath) + "/").Replace(basePath, "").Replace("\\", "/");
+        }
+
         /// <summary>
         /// Displays the given message, and closes the application after any key press.
         /// </summary>
@@ -322,9 +406,23 @@ namespace SpawnableItemFetcher
         static void WaitAndClose(string message)
         {
             Console.WriteLine(message);
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            WriteColoredLine(ConsoleColor.Cyan, "Press any key to exit...");
+            Console.ReadKey(true);
             Environment.Exit(0);
+        }
+
+        static void WriteColored(ConsoleColor color, string str, params object[] args)
+        {
+            Console.ForegroundColor = color;
+            Console.Write(str, args);
+            Console.ResetColor();
+        }
+
+        static void WriteColoredLine(ConsoleColor color, string str, params object[] args)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(str, args);
+            Console.ResetColor();
         }
     }
 }

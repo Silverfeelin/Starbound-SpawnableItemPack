@@ -1,8 +1,0 @@
-D:\Steam\steamapps\common\Starbound\mods\SpawnableItemPack\SpawnableItemFetcher\SpawnableItemFetcher\bin\Debug\SpawnableItemFetcher.exe.config
-D:\Steam\steamapps\common\Starbound\mods\SpawnableItemPack\SpawnableItemFetcher\SpawnableItemFetcher\bin\Debug\SpawnableItemFetcher.exe
-D:\Steam\steamapps\common\Starbound\mods\SpawnableItemPack\SpawnableItemFetcher\SpawnableItemFetcher\bin\Debug\SpawnableItemFetcher.pdb
-D:\Steam\steamapps\common\Starbound\mods\SpawnableItemPack\SpawnableItemFetcher\SpawnableItemFetcher\bin\Debug\Newtonsoft.Json.dll
-D:\Steam\steamapps\common\Starbound\mods\SpawnableItemPack\SpawnableItemFetcher\SpawnableItemFetcher\bin\Debug\Newtonsoft.Json.xml
-D:\Steam\steamapps\common\Starbound\mods\SpawnableItemPack\SpawnableItemFetcher\SpawnableItemFetcher\obj\Debug\SpawnableItemFetcher.exe
-D:\Steam\steamapps\common\Starbound\mods\SpawnableItemPack\SpawnableItemFetcher\SpawnableItemFetcher\obj\Debug\SpawnableItemFetcher.pdb
-D:\Steam\steamapps\common\Starbound\mods\SpawnableItemPack\SpawnableItemFetcher\SpawnableItemFetcher\obj\Debug\SpawnableItemFetcher.csprojResolveAssemblyReference.cache

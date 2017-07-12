@@ -111,13 +111,16 @@ end
 function sip.loadModItems(itemList)
   itemList = itemList or {}
   for _,modFile in ipairs(root.assetJson("/sipMods/load.config")) do
-    local items = root.assetJson("/sipMods/" .. modFile)
+    local path = modFile:find("/") and modFile or ("/sipMods/" .. modFile)
+    local items = root.assetJson(path)
     if #items > 0 then
-      if pcall(function() root.itemConfig(items[1].name) end) then
+      if root.itemConfig(items[1].name) then
         for i,v in ipairs(items) do
           table.insert(itemList, v)
         end
-      sb.logInfo("SIP: Added items from '/sipMods/%s'.", modFile)
+        sb.logInfo("SIP: Added items from '%s'.", path)
+      else
+        sb.logInfo("SIP: Skipped items from '%s'. Please update the item file.", path)
       end
     end
   end
@@ -211,6 +214,7 @@ end
 ]]
 function sip.setDrawableIcon(wid, path, drawable, directives)
   local image = drawable and drawable.image or drawable or "/assetMissing.png"
+
   if image:find("/") == 1 then path = "" end
   directives = directives or ""
   if not pcall(root.imageSize,path .. image) then image = "/assetMissing.png"; path = "" end
@@ -257,7 +261,7 @@ end
 
 function sip.randomizeItem()
   if sip.item then
-    local params = sip.getSpawnItemParameters(sip_util.itemConfig(sip.item.name).config)
+    local params = sip.getSpawnItemParameters(root.itemConfig(sip.item.name).config)
     sip.setItemSlotItem(sip.widgets.itemSlot, sip.item.name, params)
   end
 end
@@ -377,7 +381,7 @@ function sip.selectItem()
   sip.item = sip.getSelectedItem()
 
   local config
-  if sip.item then config = sip_util.itemConfig(sip.item.name).config else return end
+  if sip.item then config = root.itemConfig(sip.item.name).config else return end
 
   -- Hide category overlay
   sip.changingCategory = false
@@ -508,7 +512,7 @@ end
 --- Updates available color options for an item.
 -- Enables and disabled option buttons, and applies directives for the colors.
 -- @param itemConfig Full item parameters
--- @see sip_util.itemConfig
+-- @see root.itemConfig
 function sip.showClothingColors(itemConfig)
   local colors = itemConfig.colorOptions or {}
   for i=1,12 do
@@ -551,7 +555,7 @@ function sip.print()
   local item, q = sip.item, sip.getQuantity()
   if not item or not item.name then return end
 
-  local cfg = sip_util.itemConfig(item.name)
+  local cfg = root.itemConfig(item.name)
 
   sip.spawnItem(cfg.config, q)
 end
