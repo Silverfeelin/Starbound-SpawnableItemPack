@@ -12,6 +12,7 @@
 hs_err_pid*
 
 SpawnableItemFetcher/.vs
+**/packages/*
 SpawnableItemFetcher/SpawnableItemFetcher/bin/*
 SpawnableItemFetcher/SpawnableItemFetcher/obj/*
 SpawnableItemFetcher/SpawnableItemFetcher/SpawnableItemFetcher.csproj.user
