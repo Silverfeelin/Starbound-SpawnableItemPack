@@ -11,11 +11,12 @@ local buttonOffset = {37, -25}
 local labelOffset = {0, -8}
 
 for groupName, categories in pairs(modCategories) do
-  local labelUuid = sb.makeUuid()
-
+    -- Keep track of next widget location
   y = y - 8
   x = 1
 
+  -- Create group label
+  local labelUuid = sb.makeUuid()
   categoryScroll.children[labelUuid] = {
     type = "label",
     position = { x, y + 7 },
@@ -29,13 +30,17 @@ for groupName, categories in pairs(modCategories) do
   y = y + buttonOffset[2]
 
   for _, category in ipairs(categories) do
+    -- After 4 category buttons, move to next row.
     if i >= 4 then
       i = 0
       y = y + buttonOffset[2]
     end
+
+    -- Set horizontal position
     x = 1 + i * buttonOffset[1]
     i = i + 1
 
+    -- Create button
     local categoryButton = {
       baseImage = category.image,
       hoverImage = category.image .. "?brightness=30",
@@ -48,10 +53,12 @@ for groupName, categories in pairs(modCategories) do
       data = category.categories
     }
 
+    -- Optional text
     if category.caption then categoryButton.text = category.caption end
 
     table.insert(categoryButtons, categoryButton)
   end
 end
 
+-- Position anchor at bottom (prevents last row from missing)
 categoryScroll.children.sipCatoryAnchor2.position[2] = y - 1
