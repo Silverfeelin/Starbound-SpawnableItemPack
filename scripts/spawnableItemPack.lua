@@ -246,14 +246,17 @@ function sip.spawnItem(itemConfig, quantity)
   if itemConfig.maxStack == 1 then quantity = 1 end
 
   local item = widget.itemSlotItem(sip.widgets.itemSlot)
-  item.count = quantity
+  local maxItem = {name=item.name, count=1000, parameters = item.parameters }
 
   local it, rest = math.floor(quantity / 1000), quantity % 1000
   for i=1,it do
-    player.giveItem({name=itemName, count=1000, parameters = params })
+    player.giveItem(maxItem)
   end
 
-  player.giveItem(item)
+  item.count = rest
+  if item.count > 0 then
+    player.giveItem(item)
+  end
 
   -- Refresh
   sip.randomizeItem()
