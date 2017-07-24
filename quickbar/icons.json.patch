@@ -1,0 +1,11 @@
+[
+  {
+    "op": "add",
+    "path": "/normal/-",
+    "value": {
+      "label": "Spawnable Item Pack",
+      "scriptAction": "spawnableItemPackLoader:openInterface",
+      "icon": "/interface/sip/iconSmall.png"
+    }
+  }
+]

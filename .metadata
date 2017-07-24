@@ -1,12 +1,14 @@
 {
   "author" : "Silverfeelin",
-  "description" : "Allows you to spawn any item in the game for free, straight from your Matter Manipulator Upgrade Panel.\n\nFor usage instructions, see: ^#61b3de;https://github.com/Silverfeelin/SpawnableItemPack^reset;\n\nRequires: ^orange;Manipulated UI^reset;\n^#61b3de;https://github.com/Silverfeelin/Starbound-ManipulatedUI/releases^reset;",
+  "description" : "Allows you to spawn any item in the game for free, straight from your Matter Manipulator Upgrade Panel.\n\nFor usage instructions, see: ^#61b3de;https://github.com/Silverfeelin/SpawnableItemPack^reset;",
   "friendlyName" : "Spawnable Item Pack",
-  "includes" : [],
   "name" : "SpawnableItemPack",
   "priority" : -1,
-  "requires" : ["Manipulated UI"],
-  "version" : "1.3.0.1",
+  "includes" : [
+    "QuickbarMini",
+    "StardustLib"
+  ],
+  "version" : "1.3.2",
   "link" : "steam://url/CommunityFilePage/733665104",
   "steamContentId" : "733665104"
 }

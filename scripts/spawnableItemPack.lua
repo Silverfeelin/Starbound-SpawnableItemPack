@@ -1,62 +1,46 @@
+-- Global and shorthand.
 spawnableItemPack = {}
 sip = spawnableItemPack
 
-sip.lines = root.assetJson("/interface/sip/lines.json")
-
---[[
-  Reference list for image paths to inventory icon rarity borders.
-]]
-sip.rarities = {
-  common = "/interface/inventory/itembordercommon.png",
-  commonFlag = "/interface/sip/common.png",
-  uncommon = "/interface/inventory/itemborderuncommon.png",
-  uncommonFlag = "/interface/sip/uncommon.png",
-  rare = "/interface/inventory/itemborderrare.png",
-  rareFlag = "/interface/sip/rare.png",
-  legendary = "/interface/inventory/itemborderlegendary.png",
-  legendaryFlag = "/interface/sip/legendary.png",
-  essential = "/interface/inventory/itemborderessential.png",
-  essentialFlag = "/interface/sip/essential.png"
-}
-
---[[
-  Reference list for widget names sip uses.
-]]
-sip.widgets = {
-  quantity = "sipTextQuantity",
-  itemList = "sipItemScroll.sipItemList",
-  search = "sipTextSearch",
-  categoryBackground = "sipCategoryBackground",
-  categoryScrollArea = "sipCategoryScroll",
-  itemName = "sipLabelSelectionName",
-  itemDescription = "sipLabelSelectionDescription",
-  itemRarity = "sipImageSelectionRarity",
-  itemImage = "sipImageSelection",
-  itemImage2 = "sipImageSelection2",
-  itemImage3 = "sipImageSelection3",
-  itemSlot = "sipImageSelectionIconSlot"
-}
-
-sip.descriptionMissing = sip.lines.descriptionMissing
+-- Utility methods
+require "/scripts/sip_util.lua"
 
 --------------------------
 -- Engine/MUI Callbacks --
 --------------------------
 
---[[
-  Initializes SIP.
-  This function is called every time SIP is opened from the MUI Main Menu.
-]]
-function sip.init()
-  mui.setTitle("^shadow;" .. sip.lines.title, "^shadow;" .. sip.lines.subtitle)
-  mui.setIcon("/interface/sip/icon.png")
+--- (Event) Initializes SIP.
+function init()
+  -- Image paths for rarity border (common) and flag (commonFlag).
+  sip.rarities = config.getParameter("assets.rarities")
+  -- Widget paths.
+  sip.widgets = config.getParameter("widgetNames")
+  -- Categories
+  sip.knownCategories = config.getParameter("knownCategories")
 
-  sip.gender = player.gender()
+  -- Default color option button images for clothes. 'colorOptions' directives can be appended to each value.
+  -- see sip_util.colorOptionDirectives
+  sip.defaultColorButtonImages = config.getParameter("colorButtonImages")
+  sip.defaultPressedColorButtonImages = config.getParameter("pressedColorButtonImages")
 
-  sip.searchDelay, sip.searchTick = 10, 10
+  -- Some translatable keys. I'm probably going to remove all only used for logging messages at some point.
+  sip.lines = root.assetJson("/interface/sip/lines.json")
+  sip.loadStaticText()
+
+  -- If item has colorOptions, colorOption is used as 'colorIndex'.
+  sip.colorOption = 0
+  -- If weaponLevel has a value, it will be used as 'level'.
+  sip.weaponLevel = nil
+  -- If weaponElement has a value, it will be used as 'elementalType'.
+  sip.weaponElement = nil
+
+  -- Delay before searching after last keystroke.
+  sip.searchDelay = 10
+  sip.searchTick = sip.searchDelay
   sip.searched = true
   sip.previousSearch = ""
 
+  -- Item collections
   sip.items = root.assetJson("/sipItemDump.json")
   sip.customItems = root.assetJson("/sipCustomItems.json")
 
@@ -66,12 +50,12 @@ function sip.init()
     sip.customItems = nil
   else
     if not sip.customItems[1].name then
-      sb.logError(sip.lines.customItemNameMissing)
+      sb.logError("SIP: Did not load custom items, as a custom item was found with no 'name' set.")
       sip.customItems = nil
     elseif not pcall(function()
       root.itemConfig(sip.customItems[1].name)
     end) then
-      sb.logError(sip.lines.customItemMissing, sip.customItems[1].name)
+      sb.logError("SIP: Did not load custom items, as the '%s' item could not be found.", sip.customItems[1].name)
       sip.customItems = nil
     else
       for k,v in ipairs(sip.customItems) do
@@ -111,27 +95,43 @@ function sip.init()
   --logENV()
 end
 
+--- Load static widget text.
+-- Loads static text defined in sip.lines. Can be used to load text translated in 'lines.json'.
+function sip.loadStaticText()
+  widget.setText(sip.widgets.changeCategory, sip.lines.viewCategories)
+  widget.setText(sip.widgets.showItems, sip.lines.showItems)
+  widget.setText(sip.widgets.showObjects, sip.lines.showObjects)
+
+  widget.setText(sip.widgets.labelSpecifications, sip.lines.specifications)
+  widget.setText(sip.widgets.labelWeaponElement, sip.lines.element)
+  widget.setText(sip.widgets.labelWeaponLevel, sip.lines.level)
+  widget.setText(sip.widgets.labelClothingColor, sip.lines.color)
+end
+
 function sip.loadModItems(itemList)
   itemList = itemList or {}
   for _,modFile in ipairs(root.assetJson("/sipMods/load.config")) do
-    local items = root.assetJson("/sipMods/" .. modFile)
+    local path = modFile:find("/") and modFile or ("/sipMods/" .. modFile)
+    local items = root.assetJson(path)
     if #items > 0 then
-      if pcall(function() root.itemConfig(items[1].name) end) then
+      if root.itemConfig(items[1].name) then
         for i,v in ipairs(items) do
           table.insert(itemList, v)
         end
-      sb.logInfo(sip.lines.modAdded, modFile)
+        sb.logInfo("SIP: Added items from '%s'.", path)
+      else
+        sb.logInfo("SIP: Skipped items from '%s'. Please update the item file.", path)
       end
     end
   end
 
   return itemList
 end
---[[
-  Update function, called every game tick by MUI while the interface is opened.
-  @param dt - Delay between this and the previous update tick.
-]]
-function sip.update(dt)
+
+--- (Event) Updates SIP.
+-- Updates search timer. If timer expires, show filtered items.
+function update(dt)
+  -- Update search filter.
   if not sip.searched then
     sip.searchTick = sip.searchTick - 1
     if sip.searchTick <= 0 then
@@ -142,35 +142,30 @@ function sip.update(dt)
   end
 end
 
---[[
-  Uninitializes SIP. Called by MUI when the interface is closed.
-  May not be called properly when the MMU interface is closed directly.
-]]
-function sip.uninit()
+--- (Event) Uninitializes SIP.
+function uninit()
   sip.showCategories(false)
-  sip.showDummy(false)
 end
 
 -------------------
 -- SIP Functions --
 -------------------
 
---[[
-  Populates the item list with items for the given category, the previous categories or all categories.
-  Filters the list based on text input. Text filtering compares item shortdescription and item name with the input case-insensitive.
-  @param [category] - String representing a category or table with strings representing a set of categories. Items matching one category will be listed.
-    With no argument supplied, uses the sip.categories value instead. If sip.categories is nil, displays all items filtered by text.
-]]
+--- Shows items in a category.
+-- Populates the item list with items for the given category, the previous categories or all categories.
+-- Filters the list based on text input. Text filtering compares item shortdescription and item name with the input case-insensitive.
+-- @param[opt] category String or array of strings representing categories.
+--             With no argument supplied, uses the sip.categories value instead. If sip.categories is nil, displays all items filtered by text.
 function sip.showItems(category)
   widget.clearListItems(sip.widgets.itemList)
 
   if type(category) == "boolean" and category == false then sip.categories = nil
-  elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error(sip.lines.categoryInvalid)
+  elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error("SIP: Attempted to search for invalid category.")
   elseif type(category) ~= "nil" then sip.categories = category end
 
   local items = sip.items
-  items = sip.filterByCategory(sip.items, sip.categories)
-  items = sip.filterByText(items, sip.previousSearch)
+  items = sip_util.filterByCategory(sip.items, sip.categories)
+  items = sip_util.filterByText(items, sip.previousSearch)
 
   for i,v in ipairs(items) do
     local li = widget.addListItem(sip.widgets.itemList)
@@ -178,140 +173,35 @@ function sip.showItems(category)
     widget.setData(sip.widgets.itemList .. "." .. li, v)
     widget.setImage(sip.widgets.itemList .. "." .. li .. ".itemRarity", sip.rarities[v.rarity])
 
-    sip.setInventoryIcon({sip.widgets.itemList .. "." .. li .. ".itemIcon", sip.widgets.itemList .. "." .. li .. ".itemIcon2", sip.widgets.itemList .. "." .. li .. ".itemIcon3"}, v)
+    sip.setListIcon(sip.widgets.itemList .. "." .. li .. ".itemIcon", v)
   end
 
-  sb.logInfo(sip.lines.itemsAdded,  #items)
+  sb.logInfo("SIP: Done adding %s items to the list!",  #items)
 end
 
-function sip.setInventoryIcon(widgets, item)
-  if type(widgets) == "string" then
+function sip.setItemSlotItem(w, item, params)
+  if not item then return end
+
+  if type(w) == "string" then
     if type(item) == "string" then
-      widget.setItemSlotItem(widgets, {name=item})
-    else
-      widget.setItemSlotItem(widgets, item)
+      item = {name=item, parameters = params}
     end
-    return
+    widget.setItemSlotItem(w, item)
   end
-
-  local directives = item.directives or ""
-
-  if type(item.icon) == "string" and item.icon ~= "null" then
-      sip.setDrawableIcon(widgets[1], item.path, item.icon, directives)
-      sip.setDrawableIcon(widgets[2])
-      sip.setDrawableIcon(widgets[3])
-    elseif type(item.icon) == "table" then
-      sip.setDrawableIcon(widgets[1], item.path, item.icon[1], directives)
-      sip.setDrawableIcon(widgets[2], item.path, item.icon[2], directives)
-      sip.setDrawableIcon(widgets[3], item.path, item.icon[3], directives)
-    end
 end
 
-function sip.setPreviewIcon(widgets, item)
-  if type(item.icon) == "string" and item.icon ~= "null" then
-    local category = item.category:lower()
-
-    widget.setImage(widgets[1], "/assetMissing.png")
-    widget.setImage(widgets[2], "/assetMissing.png")
-    widget.setImage(widgets[3], "/assetMissing.png")
-
-    if category == "headarmour" or category == "headwear" or category == "head" then
-      sip.showDummy(true)
-      widget.setVisible("sipImageDummyHead", true)
-      sip.setDrawableIcon(widgets[1], item.path, "head.png:normal?replace;ffffff00=00000001;00000000=00000001", item.directives)
-    elseif category == "chestarmour" or category == "chestwear" or category == "chest" then
-      sip.showDummy(true)
-      local cfg = sip.getItemConfig(item.name)
-      local frames = cfg.config[sip.gender .. "Frames"]
-      sip.setDrawableIcon(widgets[3], item.path, frames.backSleeve .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
-      sip.setDrawableIcon(widgets[2], item.path, frames.body .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
-      sip.setDrawableIcon(widgets[1], item.path, frames.frontSleeve .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
-    elseif category == "legarmour" or category == "legwear" or category == "legs" then
-      sip.showDummy(true)
-      local cfg = sip.getItemConfig(item.name)
-      local frames = cfg.config[sip.gender .. "Frames"]
-      sip.setDrawableIcon(widgets[2], item.path, frames .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
-    elseif category == "enviroprotectionpack" or category == "backwear" or category == "back" then
-      sip.showDummy(true)
-      local cfg = sip.getItemConfig(item.name)
-      local frames = cfg.config[sip.gender .. "Frames"]
-      sip.setDrawableIcon(widgets[3], item.path, frames .. ":idle.1?replace;ffffff00=00000001;00000000=00000001", item.directives)
-    else
-      -- Hide dummy
-      sip.showDummy(false)
-
-      -- Scan item configs for better image.
-      local cfg = sip.getItemConfig(item.name)
-      if not cfg then return end
-
-      if cfg.config.animationParts then
-        local path = nil
-        local l = false
-        for k,v in pairs(cfg.config.animationParts) do
-          if not l then
-            -- Lazy fix for displaying activeitems.
-            local ignoreKeys = { muzzleFlash = true, swoosh = true, handleFullbright = true, detectorfullbright = true, gunfullbright = true, bladefullbright = true, beamorigin = true, chargeEffect = true, stone = true, middlefullbright = true, discunlit = true, disc = true, apexkey = true, aviankey = true, florankey = true, humankey = true, glitchkey = true, novakidkey = true, hylotlkey = true }
-            if v ~= "" and not ignoreKeys[k] then
-              l = true
-              path = v
-            end
-          end
-        end
-        if not path then path = cfg.config.inventoryIcon end
-        if path then
-          if item.category == "shield" then
-            sip.setDrawableIcon(widgets[1], item.path, path .. ":nearidle", item.directives)
-          else
-            sip.setDrawableIcon(widgets[1], item.path, path, item.directives)
-          end
-        end
-
-      elseif cfg.config.orientations then
-        local path = nil
-        local img = type(cfg.config.orientations[1].image) == "string" and cfg.config.orientations[1].image or
-        type(cfg.config.orientations[1].dualImage) == "string" and cfg.config.orientations[1].dualImage or
-        type(cfg.config.orientations[1].leftImage) == "string" and cfg.config.orientations[1].leftImage or
-        type(cfg.config.orientations[1].rightImage) == "string" and cfg.config.orientations[1].rightImage or
-        (cfg.config.orientations[1].imageLayers and (cfg.config.orientations[1].imageLayers[1].image or cfg.config.orientations[1].imageLayers[1].dualImage))
-
-        img = img:match(".-%.png")
-        if img and img ~= "" then
-          if item.frame then img = img .. ":" .. item.frame end
-          sip.setDrawableIcon(widgets[1], item.path, img, item.directives)
-        end
-      elseif cfg.config.largeImage then
-        sip.setDrawableIcon(widgets[1], item.path, cfg.config.largeImage, item.directives)
-      elseif cfg.config.placementPreviewImage then
-        sip.setDrawableIcon(widgets[1], item.path, cfg.config.placementPreviewImage, item.directives)
-      elseif cfg.config.image then
-        sip.setDrawableIcon(widgets[1], item.path, cfg.config.image, item.directives)
-      elseif cfg.config.inventoryIcon then
-        sip.setInventoryIcon(widgets, item)
-        sb.logInfo(sip.lines.previewMissing, item)
-      else
-        error(sip.lines.imageError)
-      end
-    end
-  end
+function sip.setListIcon(w, item)
+  local directives = item.directives or ""
+  sip.setDrawableIcon(w, item.path, item.icon, directives)
 end
 
 function sip.clearPreview()
   widget.setItemSlotItem(sip.widgets.itemSlot, nil);
-  local widgets = {"sipImageSelection", "sipImageSelection2", "sipImageSelection3"}
-  for _,v in ipairs(widgets) do
-    widget.setImage(v, "/assetMissing.png")
-  end
   widget.setText(sip.widgets.itemDescription, sip.lines.itemDetails)
   widget.setText(sip.widgets.itemName, sip.lines.noSelection)
   widget.setImage(sip.widgets.itemRarity, sip.rarities["commonFlag"])
-  sip.showDummy(false)
-end
 
-function sip.showDummy(bool)
-  widget.setVisible("sipImageDummyFrontArm", bool)
-  widget.setVisible("sipImageDummyBackArm", bool)
-  widget.setVisible("sipImageDummyBody", bool)
-  widget.setVisible("sipImageDummyHead", bool)
+  sip.showSpecifications(nil)
 end
 
 --[[
@@ -324,54 +214,11 @@ end
 ]]
 function sip.setDrawableIcon(wid, path, drawable, directives)
   local image = drawable and drawable.image or drawable or "/assetMissing.png"
+
   if image:find("/") == 1 then path = "" end
   directives = directives or ""
   if not pcall(root.imageSize,path .. image) then image = "/assetMissing.png"; path = "" end
   widget.setImage(wid, path .. image .. directives)
-end
-
---[[
-  Filters the given item list by the given category/categories.
-  @param list - Item table, as stored in the item dump.
-  @param categories - String representing a category name, or a table of strings representing a collection of categories.
-    Items matching one or more category will pass this check.
-]]
-function sip.filterByCategory(list, categories)
-  if categories == nil then return list end
-  if type(categories) == "string" then categories = { [categories] = true }
-  elseif type(categories) == "table" then categories = Set(categories)
-  else error(sip.lines.filterCategoryError) end
-
-  local results = {}
-  for _,v in pairs(list) do
-    if categories[v.category:lower()] then
-      table.insert(results, v)
-    end
-  end
-
-  return results
-end
-
---[[
-  Filters the given item list by the given text. Both item names and shortdescriptions are checked.
-  Checking is case-insensitive.
-  @param list - Item table, as stored in the item dump.
-  @param text - Text to filter by.
-]]
-function sip.filterByText(list, text)
-  if type(text) ~= "string" then error(sip.lines.filterTextError) end
-  if text == "" then return list end
-
-  text = text:lower()
-
-  local results = {}
-  for _,v in pairs(list) do
-    if v.shortdescription:lower():find(text) or v.name:lower():find(text) then
-      table.insert(results, v)
-    end
-  end
-
-  return results
 end
 
 --[[
@@ -390,53 +237,55 @@ end
 --[[
   Spawns the given item in the given quantity.
   Does not check for validity.
-  @param itemName - Identifier of the item to spawn.
-  @param quantity - Amount of items to spawn. Loops every 1000 to work around the engine's limit.
+  @param itemName Identifier of the item to spawn.
+  @param itemConfig Full item configuration. Parameters are not used.
+  @param quantity Amount of items to spawn. Loops every 1000 to work around the engine's limit.
 ]]
-function sip.spawnItem(itemName, quantity)
-  local weaponLevel = nil
-  if not pcall(function()
-    local cfg = root.itemConfig(itemName)
+function sip.spawnItem(itemConfig, quantity)
+  quantity = quantity or 1
+  if itemConfig.maxStack == 1 then quantity = 1 end
 
-    if cfg.config then
-      if cfg.config.level then
-        weaponLevel = sip.weaponLevel
-      elseif cfg.config.itemTags then
-        -- Added check for "weapon" itemTag, since not all weapons that support the level parameter
-        -- contain it in their default configuration.
-        for k,v in ipairs(cfg.config.itemTags) do
-          if v:lower() == "weapon" then
-            weaponLevel = sip.weaponLevel
-            goto done
-          end
-        end
-        ::done::
-      end
-    end
-  end) then
-    sb.logError(sip.lines.spawnItemMissing, itemName)
-    return
-  end
-
-  local params = nil
-  if weaponLevel then params = { level = weaponLevel } end
+  local item = widget.itemSlotItem(sip.widgets.itemSlot)
+  item.count = quantity
 
   local it, rest = math.floor(quantity / 1000), quantity % 1000
   for i=1,it do
     player.giveItem({name=itemName, count=1000, parameters = params })
   end
-  player.giveItem({name=itemName, count=rest, parameters = params })
+
+  player.giveItem(item)
+
+  -- Refresh
+  sip.randomizeItem()
 end
 
---[[
-  Returns the currently selected item, if any.
-  @return - Item data, as stored in the item dump.
-]]
+function sip.randomizeItem()
+  if sip.item then
+    local params = sip.getSpawnItemParameters(root.itemConfig(sip.item.name).config)
+    sip.setItemSlotItem(sip.widgets.itemSlot, sip.item.name, params)
+  end
+end
+
+function sip.getSpawnItemParameters(itemConfig)
+  local params = {}
+  if sip.weaponLevel then params.level = sip.weaponLevel end
+
+  local elem = sip.getWeaponElement()
+  if elem then params.elementalType = elem end
+  if sip_util.isColorable(itemConfig) then params.colorIndex = sip.colorOption end
+
+  return params
+end
+
+--- Gets the currently selected item from the list.
+-- If no item is selected in the list, the current item is returned.
+-- @return - Item data, as stored in the item dump.
+-- @see sip.widgets.itemList, sip.item
 function sip.getSelectedItem()
   local li = widget.getListSelected(sip.widgets.itemList)
-  if not li then return nil end
+  if not li then return sip.item end
   local item = widget.getData(sip.widgets.itemList .. "." .. li)
-  return item
+  return item or sip.item
 end
 
 --[[
@@ -470,77 +319,46 @@ end
   @return - Quantity of item to print.
 ]]
 function sip.getQuantity()
-  if type(sip.quantity) ~= "number" then error(sip.lines.quantityInvalid) end
+  if type(sip.quantity) ~= "number" then error("SIP: Quantity is stored incorrectly. Please contact the mod author.") end
   return sip.quantity
 end
 
---[[
-  Sets to currently selected quantity of items to print to the given amount. Errors if the given value is not a number.
-  Updates the displayed quantity.
-  @param amnt - New quantity. Should be an integer.
-]]
+--- Set item quantity.
+-- @param amnt New quantity
 function sip.setQuantity(amnt)
-  if type(amnt) ~= "number" then error(sip.lines.setQuantityInvalid) end
+  if type(amnt) ~= "number" then error("SIP: Attempted to set quantity to an invalid number. Please contact the mod author.") end
   sip.quantity = math.clamp(amnt, 0, 9999)
 
   widget.setText(sip.widgets.quantity, "x" .. sip.getQuantity())
 end
 
---[[
-  Adjusts the selected quantity of items to print by the given amount. Errors if the passed value is not a number.
-  @param amnt - Amount to adjust the quantity with. Can be positive and negative. Should be an integer.
-]]
+--- Adjust item quantity.
+-- @param amnt Amount to adjust the quantity with
 function sip.adjustQuantity(amnt)
-  if type(amnt) ~= "number" then error(sip.lines.adjustQuantityInvalid) end
+  if type(amnt) ~= "number" then error("SIP: Attempted to adjust quantity by an invalid number. Please contact the mod author.") end
   sip.setQuantity(sip.getQuantity() + amnt)
 end
 
---[[
-  Returns the game's item configuration for the given item, handling errors when an invalid item is given.
-  Note that details are generally stored in returnValue.config. The parameter returnValue.parameters
-  may also contain useful data.
-  @param itemName - Item identifier used to spawn the item with (usually itemName or objectName).
-  @return - Item configuration as root.itemConfig returns it, or nil if the item configuration could not be found.
-]]
-function sip.getItemConfig(itemName)
-  local cfg
-  if pcall(function()
-    cfg = root.itemConfig(itemName)
-  end) then
-    return cfg
-  else
-    sb.logError(sip.lines.itemConfigurationMissing, itemName)
-    return nil
-  end
-end
-
-----------------------
 -- Widget Callbacks --
 ----------------------
 
---[[
-  Widget callback function. Resets the search timeout when a key was pressed.
-  Each update searchTick is lowered by one. When this value reaches 0, the list will be filtered (see sip.update).
-]]
+--- Reset search timer.
+-- Each update searchTick is lowered by one. When this value reaches 0, the list will be filtered.
+-- @see update
 function sip.search()
   sip.searchTick = sip.searchDelay
   sip.searched = false
 end
 
---[[
-  Widget callback function. Used to toggle the category display.
-]]
+--- Show or hide category panel.
 function sip.changeCategory()
   sip.changingCategory = not sip.changingCategory
   sip.showCategories(sip.changingCategory)
 end
 
---[[
-  Widget callback function. Uses the widget name to identify whether a category was selected or deselected.
-  Shows items relevant to the category widget, by parsing it's widget data.
-  @param w - Widget name.
-  @param category - Widget data, structured "category" or ["category", "category2"].
-]]
+--- Shows items for a category.
+-- @param w Widget name. Used to determine index.
+-- @param category Category to select, structured "category" or ["category", "category2"].
 function sip.selectCategory(w, category)
   local index = widget.getSize("sipCategoryIndex")
   local selecting = index[1] == 0
@@ -557,36 +375,34 @@ function sip.selectCategory(w, category)
   end
 end
 
---[[
-  Widget callback function. Used to display item information on the currently selected item.
-]]
-function sip.itemSelected()
-  local item = sip.getSelectedItem()
-  local config
-  if item then config = sip.getItemConfig(item.name) else return end
-  -- Config is a parameter of the returned item config.. for reasons.
-  config = config and config.config or {}
+--- Displays item information and options.
+-- Shows option containers based on item type (weapon, clothing).
+function sip.selectItem()
+  sip.item = sip.getSelectedItem()
 
-  -- Hide category overlay, to show the item.
+  local config
+  if sip.item then config = root.itemConfig(sip.item.name).config else return end
+
+  -- Hide category overlay
   sip.changingCategory = false
   sip.showCategories(false)
 
-  widget.setText(sip.widgets.itemName, item.shortdescription or config.shortdescription or item.name)
-  widget.setText(sip.widgets.itemDescription, config.description or sip.descriptionMissing)
+  -- Show text
+  widget.setText(sip.widgets.itemName, config.shortdescription or sip.item.name)
+  widget.setText(sip.widgets.itemDescription, config.description or sip.lines.descriptionMissing)
 
-  local rarity = item.rarity and item.rarity:lower() or "common"
+  -- Rarity
+  local rarity = sip.item.rarity and sip.item.rarity:lower() or "common"
   widget.setImage(sip.widgets.itemRarity, sip.rarities[rarity .. "Flag"])
 
-  local directives = item.directives or ""
-
-  sip.setInventoryIcon(sip.widgets.itemSlot, item)
-  sip.setPreviewIcon({"sipImageSelection", "sipImageSelection2", "sipImageSelection3"}, item)
+  -- Item slot
+  sip.randomizeItem()
+  sip.showSpecifications(config)
 end
 
---[[
-  Widget callback function. Parses widget data. If this is a number, adjust quantity by it.
-  If this is not a number, fetch quantity from the text field instead.
-]]
+--- Adjusts item quantity.
+--  Parses widget data. If this is a number, adjust quantity by it.
+-- If this is not a number, fetch quantity from the text field instead.
 function sip.changeQuantity(_, data)
   if type(data) == "number" then
     sip.adjustQuantity(data)
@@ -597,132 +413,179 @@ function sip.changeQuantity(_, data)
   end
 end
 
---[[
-  Widget callback function. Parses widget data. If this is a number, adjust quantity by it.
-  If this is not a number, fetch quantity from the text field instead.
-]]
+function sip.showSpecifications(itemConfig)
+  local pane = nil
+
+  local levelable = sip_util.isLevelableWeapon(itemConfig)
+
+  if sip_util.isColorable(itemConfig) then
+    pane = sip.widgets.specificationPanes.clothingPane
+    sip.showClothingColors(itemConfig)
+  elseif levelable then
+    pane = sip.widgets.specificationPanes.weaponPane
+    sip.showWeaponElements(itemConfig)
+  end
+
+  -- Allow rolling items with a 'builderConfig'
+  local rollable = false
+  if itemConfig and itemConfig.builderConfig then rollable = true end
+  widget.setVisible(sip.widgets.dice, rollable)
+
+  -- Ensure proper weapon level.
+  if not levelable then
+    sip.weaponLevel = nil
+  elseif not sip.weaponLevel then
+    sip.weaponLevel = sip.getWeaponLevel()
+  end
+
+  for _,v in pairs(sip.widgets.specificationPanes) do
+    widget.setVisible(v, pane == v)
+  end
+end
+
+--- Changes the weapon level.
+-- Parses widget data. If this is a number, adjust weapon level by it.
+-- If this is not a number, fetch quantity from the text field instead.
+-- Value is clamped between 1 and 10.
 function sip.changeWeaponLevel(_, data)
   local level = 1
   if type(data) == "number" then
     level = (sip.weaponLevel or 1) + data
   else
-    local str = widget.getText("sipSettingsScroll.weaponLevel")
-    local n = tonumber(str)
+    local n = sip.getWeaponLevel()
     if n then
       level = n
     else return end
   end
 
   sip.weaponLevel = math.clamp(level, 1, 10)
-  widget.setText("sipSettingsScroll.weaponLevel", tostring(sip.weaponLevel))
+  widget.setText(sip.widgets.weaponLevel, tostring(sip.weaponLevel))
+  sip.randomizeItem()
 end
 
---[[
-  Widget callback function. Spawns the current quantity of the current item.
-  If the max stack size of the item is 1, spawn 1 instead.
-  Logs an error if this item could not be spawned, by checking if it has an item configuration.
-  This step costs additional time, but shouldn't affect performance as the callback is only called every time the user presses print.
-]]
-function sip.print()
-  local item, q = sip.getSelectedItem(), sip.getQuantity()
-  if not item or not item.name then return end
-
-  local cfg = sip.getItemConfig(item.name)
-  if cfg and cfg.config.maxStack == 1 then q = 1 end
-
-  sip.spawnItem(item.name, q)
+function sip.getWeaponLevel()
+  local str = widget.getText(sip.widgets.weaponLevel)
+  return tonumber(str) or 1
 end
 
---[[
-  Widget callback function. Shows all item of the given type.
-  @param _ - Widget name. Unused.
-  @param t - Widget data representing the type to show. Should be items or objects
-]]
-function sip.showType(_, t)
-  if type(t) ~= "string" then error(sip.lines.showTypeInvalid) end
-  local cats = {
-    objects = { "object", ".object", "genboss", "terraformer", "materials", "liqitem", "supports", "railpoint", "decorative", "actionfigure", "artifact", "breakable", "bug", "crafting", "spawner", "door", "light", "storage", "furniture", "trap", "wire", "sapling", "seed", "other", "generic", "teleportmarker" },
-    items = { "headwear", "chestwear", "legwear", "backwear", "headarmour", "chestarmour", "legarmour", "enviroprotectionpack", "broadsword", "fistweapon", "chakram", "axe", "dagger", "hammer", "spear", "shortsword", "whip", "melee", "ranged", "sniperrifle", "boomerang", "bow", "shotgun", "assaultrifle", "machinepistol", "rocketlauncher", "pistol", "grenadelauncher", "staff", "wand", "throwableitem", "shield", "vehiclecontroller", "railplatform", "upgrade", "shiplicense", "mysteriousreward", "toy", "clothingdye", "medicine", "drink", "food", "preparedfood", "craftingmaterial", "cookingingredient", "upgradecomponent", "smallfossil", "mediumfossil", "largefossil", "codex", "quest", "junk", "currency", "trophy", "tradingcard", "eppaugment", "petcollar", "musicalinstrument", "tool" }
-  }
-  if not cats[t] then sb.logError(sip.lines.showTypeFailed, t) return end
-  sip.showItems(cats[t])
-
-  widget.setSelectedOption("sipCategoryScroll.sipCategoryGroup", -1)
+function sip.selectWeaponElement(_, data)
+  sip.randomizeItem()
 end
 
---[[
-  NOT IMPLEMENTED
-  Widget callback function. Used to scroll between item pages when there's a set limit on the amount
-  of items displayed per page, and the amount of items to be listed exceeds this number.
-  @param _ - Widget name; not used.
-  @param data - Widget data. -2 = First page. -1 = Previous page. 1 = Next page. 2 = Last page.
-]]
-function sip.changePage(_, data)
-  -- TODO: Remove or implement pages and displaying of items per page. Performance seems decent enough not to require pages.
-  -- Could be used at some point when the game or mods add so many items that performance destabilizes.
-end
-
--------------------
--- MUI Callbacks --
--------------------
-
---[[
-  MUI Callback function. Called when the settings menu is opened.
-  Sets the background body image to the default one of MUI.
-]]
-function sip.settingsOpened()
-  widget.setImage("bgb", "/interface/sip/settingsBody.png")
-  sip.showCategories(false)
-end
-
---[[
-  MUI Callback function. Called when the settings menu is closed.
-  Sets the background body image to the default one of SIP.
-]]
-function sip.settingsClosed()
-  widget.setImage("bgb", "/interface/sip/body.png")
-  sip.showCategories(sip.changingCategory)
-end
-
-----------------------
--- Useful functions --
-----------------------
-
---[[
-  Logs environmental functions, tables and nested functions.
-]]
-function logENV()
-  for i,v in pairs(_ENV) do
-    if type(v) == "function" then
-      sb.logInfo("%s", i)
-    elseif type(v) == "table" then
-      for j,k in pairs(v) do
-        sb.logInfo("%s.%s (%s)", i, j, type(k))
+function sip.showWeaponElements(itemConfig)
+  local c = itemConfig
+  if c.elementalType then
+    sip.enableWeaponElements(c.elementalType)
+  elseif c.builderConfig then
+    local elements = {}
+    for _,v in ipairs(c.builderConfig) do
+      if v.elementalType then
+        for _,w in ipairs(v.elementalType) do
+          elements[w] = true
+        end
       end
     end
+    sip.enableWeaponElements(elements)
+  else
+    sip.enableWeaponElements(nil)
   end
 end
 
---[[
-  Clamps and returns a value between the minimum and maximum value.
-  @param i - Value to clamp.
-  @param low - Minimum bound (inclusive).
-  @param high - Maximum bound (inclusive).
-  @return - low when i<low, high when i>high, or i.
-]]
-function math.clamp(i, low, high)
-  if low > high then low, high = high, low end
-  return math.min(high, math.max(low, i))
+function sip.enableWeaponElements(elements)
+  elements = type(elements) == "table" and elements or
+             type(elements) == "string" and { [elements] = true } or
+             {}
+
+  for k,v in pairs(sip.widgets.elementOptions) do
+    widget.setOptionEnabled(sip.widgets.weaponElement, v, elements[k])
+  end
+
+  widget.setSelectedOption(sip.widgets.weaponElement, -1)
 end
 
---[[
-  Creates and returns a set for the given table, using the values of the table as keys.
-  @param list - Table containing string values.
-  @return - Set
-]]
---https://www.lua.org/pil/11.5.html
-function Set (list)
-  local set = {}
-  for _, l in ipairs(list) do set[l] = true end
-  return set
+function sip.getWeaponElement()
+  local index = widget.getSelectedOption(sip.widgets.weaponElement)
+  local d = widget.getData(sip.widgets.weaponElement .. "." .. index)
+  return d
+end
+
+--- Updates available color options for an item.
+-- Enables and disabled option buttons, and applies directives for the colors.
+-- @param itemConfig Full item parameters
+-- @see root.itemConfig
+function sip.showClothingColors(itemConfig)
+  local colors = itemConfig.colorOptions or {}
+  for i=1,12 do
+    widget.setOptionEnabled("paneClothing.clothingColor", i - 1, not not colors[i])
+    local c = copyTable(sip.defaultColorButtonImages)
+    local cp = copyTable(sip.defaultPressedColorButtonImages)
+    if colors[i] then
+      local d = sip_util.colorOptionDirectives(colors[i])
+      for k,v in pairs(c) do
+        c[k] = c[k] .. d
+      end
+      for k,v in pairs(cp) do
+        cp[k] = cp[k] .. d
+      end
+    end
+
+    widget.setButtonImages("paneClothing.clothingColor." .. (i - 1), c)
+    widget.setButtonCheckedImages("paneClothing.clothingColor." .. (i - 1), cp)
+  end
+
+  widget.setSelectedOption("paneClothing.clothingColor", 0)
+  sip.colorOption = 0
+end
+
+--- Selects a color option.
+-- The selection option (index) is used by printed items.
+-- @param _
+-- @param data Color option index (starting at 1).
+function sip.selectClothingColor(_, data)
+  if data then
+    sip.colorOption = data
+    sip.randomizeItem()
+  end
+end
+
+--- Spawns the current quantity of the current item.
+-- If the max stack size of the item is 1, spawn 1 instead.
+-- Logs an error if this item could not be spawned, by checking if it has an item configuration.
+function sip.print()
+  local item, q = sip.item, sip.getQuantity()
+  if not item or not item.name then return end
+
+  local cfg = root.itemConfig(item.name)
+
+  sip.spawnItem(cfg.config, q)
+end
+
+function sip.takeItem()
+  if not player.swapSlotItem() then
+    local item = widget.itemSlotItem(sip.widgets.itemSlot)
+    player.setSwapSlotItem(item)
+    sip.randomizeItem()
+  end
+end
+
+--- Shows all item of the given type.
+-- @param _
+-- @param t Widget data representing the type to show. Should be items or objects
+function sip.showType(_, t)
+  if type(t) ~= "string" then error("SIP: Attempted to run sip.showType with a value other than a string.") end
+  if not sip.knownCategories[t] then sb.logError("SIP: Could now show items for the type '%s'.", t) return end
+  sip.showItems(sip.knownCategories[t])
+
+  widget.setSelectedOption(sip.widgets.categoryGroup, -1)
+end
+
+--- Changes item pages.
+-- NOT IMPLEMENTED
+-- Widget callback function. Used to scroll between item pages when there's a set limit on the amount
+-- of items displayed per page, and the amount of items to be listed exceeds this number.
+-- @param _
+-- @param data Widget data. -2 = First page. -1 = Previous page. 1 = Next page. 2 = Last page
+function sip.changePage(_, data)
+  -- TODO: Remove or implement pages and displaying of items per page. Performance seems decent enough not to require pages.
+  -- Could be used at some point when the game or mods add so many items that performance destabilizes.
 end

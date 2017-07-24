@@ -11,11 +11,8 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-SpawnableItemFetcher/SpawnableItemFetcher/bin/Debug/SpawnableItemFetcher.exe
-SpawnableItemFetcher/SpawnableItemFetcher/bin/Debug/SpawnableItemFetcher.pdb
-SpawnableItemFetcher/SpawnableItemFetcher/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
-SpawnableItemFetcher/SpawnableItemFetcher/obj/Debug/SpawnableItemFetcher.csproj.FileListAbsolute.txt
-SpawnableItemFetcher/SpawnableItemFetcher/obj/Debug/SpawnableItemFetcher.csprojResolveAssemblyReference.cache
-SpawnableItemFetcher/SpawnableItemFetcher/obj/Debug/SpawnableItemFetcher.exe
-SpawnableItemFetcher/SpawnableItemFetcher/obj/Debug/SpawnableItemFetcher.pdb
+SpawnableItemFetcher/.vs
+**/packages/*
+SpawnableItemFetcher/SpawnableItemFetcher/bin/*
+SpawnableItemFetcher/SpawnableItemFetcher/obj/*
 SpawnableItemFetcher/SpawnableItemFetcher/SpawnableItemFetcher.csproj.user

@@ -1,1 +1,0 @@
-"SpawnableItemFetcher.exe" "D:\Path\To\Assets" "D:\Path\To\Mod\sipCustomItems.json.patch"
