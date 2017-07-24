@@ -6,15 +6,13 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 - [Usage](#usage)
 - [Features](#features)
 - [Adding Items](https://github.com/Silverfeelin/Starbound-SpawnableItemPack/wiki/Adding-Items)
-- [Planned](#planned)
 - [Potential Issues](#potential-issues)
-- [Fatal Exception](#fatal-exception)
 - [Contributing](#contributing)
 
 ## Installation
 * [Download](https://github.com/Silverfeelin/SpawnableItemPack/releases) the release for the current version of Starbound.
 * Place the `SpawnableItemPack.pak` file in your mods folder (eg. `D:\Steam\steamapps\common\Starbound\mods\`). Overwrite the existing file if necessary.
-* Optionally, place the `ManipulatedUI.pak` in the same mods folder. This step is necessary if you don't have this mod yet (or your version is outdated).
+* Optionally, place the `QuickbarMini.pak` in the same mods folder. This step is necessary if you don't have the mod (or StardustLib) yet.
  * This file is included in the zipped release.
 
 ## Usage
@@ -22,7 +20,7 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 * Open the matter manipulator upgrade panel.
 * Select 'Open Spawnable Item Pack' from the available options.
 
-Don't worry, the bundled [Manipulated UI][mui] mod ensures you still have access to the original functionality of the upgrade panel! This menu is used for the mod as it's multiplayer-friendly and can be accessed anywhere.
+Don't worry, the bundled [Quickbar Mini][qbm] mod ensures you still have access to the original functionality of the upgrade panel! This menu is used for the mod as it's multiplayer-friendly and can be accessed anywhere.
 
 ![Open MMU](https://raw.githubusercontent.com/Silverfeelin/SpawnableItemPack/master/readme/openInterface.png "Open the matter manipulator upgrade panel")
 
@@ -43,24 +41,13 @@ You can only select one category at once. Deselecting the current category is po
 * Change settings such as the level of generated weapons in the advanced settings menu.
  * You can open this menu by selecting the cog in the top right corner of the interface.
 
-## Planned
-* Fixing preview images. This includes icons for random weapons, and single-frame previews.
-* Custom categories, for items from mods.
-
 ## Potential Issues
 * Game updates that remove items may cause issues, as the mod uses it's own item dump to populate lists.
 * Game updates that add items requires an update to the item dump to show in SIP.
-* Mixing Steam Workshop and GitHub releases may cause load order issues.
- * If you install Manipulated UI in the Workshop and Spawnable Item Pack here, it will cause a fatal exception. Hopefully Chucklefish will fix this, but the solution is to install Spawnable Item Pack through the Workshop *or* download and install Manipulated UI from GitHub.
- * Installing Manipulated UI from GitHub **and** the Steam Workshop doesn't seem to hurt.
-
-## Fatal Exception
-If you're greeted with a fatal exception after installing the mod, this most likely means you did not install the Manipulated UI dependency. Please read the Installation steps carefully.
-The Manipulated UI dependency can be downloaded from [the official repository](https://github.com/Silverfeelin/Starbound-ManipulatedUI/releases), but is also bundled with [each release](https://github.com/Silverfeelin/SpawnableItemPack/releases).
 
 ## Contributing
 If you have any suggestions or feedback that might help improve this mod, please do post them [on the discussion page](http://community.playstarbound.com/resources/spawnable-item-pack-spawn-all-items-for-free.515/)!
 You can also create pull requests and contribute directly to the mod!
 
-[mui]:(https://github.com/Silverfeelin/Starbound-ManipulatedUI)
-[muiRelease]:(https://github.com/Silverfeelin/Starbound-ManipulatedUI/releases)
+[qbm]:(https://github.com/Silverfeelin/Starbound-Quickbar-Mini)
+[qbmRelease]:(https://github.com/Silverfeelin/Starbound-Quickbar-Mini/releases)
