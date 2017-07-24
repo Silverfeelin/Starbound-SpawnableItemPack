@@ -4,9 +4,8 @@
     "path": "/normal/-",
     "value": {
       "label": "Spawnable Item Pack",
-      "pane": "/interface/sip/sip.config",
-      "icon": "/interface/sip/iconSmall.png",
-      "loadScript": "/scripts/spawnableItemPackLoader.lua"
+      "scriptAction": "spawnableItemPackLoader:openInterface",
+      "icon": "/interface/sip/iconSmall.png"
     }
   }
 ]
