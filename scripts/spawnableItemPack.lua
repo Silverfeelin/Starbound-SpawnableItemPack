@@ -5,9 +5,8 @@ sip = spawnableItemPack
 -- Utility methods
 require "/scripts/sip_util.lua"
 
---------------------------
--- Engine/MUI Callbacks --
---------------------------
+-- Define callbacks
+require "/scripts/sip_callback.lua"
 
 --- (Event) Initializes SIP.
 function init()
@@ -38,6 +37,7 @@ function init()
   sip.searchDelay = 10
   sip.searchTick = sip.searchDelay
   sip.searched = true
+  -- Stores last used search text for showItems. sip.filter modifies this.
   sip.previousSearch = ""
 
   -- Item collections
@@ -73,26 +73,20 @@ function init()
 
   sip.clearPreview()
 
-  -- Synchronize UI with script
-  sip.previousSearch = ""
-  sip.filter()
-  sip.changeQuantity()
+  -- Load previous search filter
+  sip.previousSearch = status.statusProperty("sip.previousSearch") or ""
+  widget.setText("sipTextSearch", sip.previousSearch)
+  sip.searched = true
 
-  local category, categoryData = sip.getSelectedCategory()
-  if category then
-    widget.setSize("sipCategoryIndex", {0,0})
-    sip.selectCategory(category, categoryData)
+  -- Load previous category
+  -- Uses index, which means that the wrong category may be selected after installing/uninstalling mods.
+  local cat = status.statusProperty("sip.selectedCategory") or -1
+  if cat ~= -1 and widget.getData("sipCategoryScroll.sipCategoryGroup." .. cat) then
+    -- Will call sip.selectCategory which will refresh items
+    widget.setSelectedOption("sipCategoryScroll.sipCategoryGroup", cat)
   else
     sip.showItems()
   end
-
-  local levelStr = widget.getText("sipSettingsScroll.weaponLevel")
-  local weaponLevel = tonumber(levelStr)
-  if weaponLevel then
-    sip.weaponLevel = weaponLevel
-  end
-
-  --logENV()
 end
 
 --- Load static widget text.
@@ -137,19 +131,14 @@ function update(dt)
     if sip.searchTick <= 0 then
       sip.searched = true
       sip.searchTick = sip.searchDelay
-      sip.filter()
+      if sip.shouldFilter() then
+        sip.previousSearch = widget.getText(sip.widgets.search)
+        status.setStatusProperty("sip.previousSearch", sip.previousSearch)
+        sip.showItems()
+      end
     end
   end
 end
-
---- (Event) Uninitializes SIP.
-function uninit()
-  sip.showCategories(false)
-end
-
--------------------
--- SIP Functions --
--------------------
 
 --- Shows items in a category.
 -- Populates the item list with items for the given category, the previous categories or all categories.
@@ -179,6 +168,10 @@ function sip.showItems(category)
   sb.logInfo("SIP: Done adding %s items to the list!",  #items)
 end
 
+--- Sets the item slot item.
+-- @param w Item slot widget.
+-- @param item Item descriptor or name.
+-- @param[opt] params Item parameters.
 function sip.setItemSlotItem(w, item, params)
   if not item then return end
 
@@ -190,11 +183,16 @@ function sip.setItemSlotItem(w, item, params)
   end
 end
 
+--- Sets the icon for a list items.
+-- @param w Full widget path to the list item image widget.
+-- @param item SIP item.
 function sip.setListIcon(w, item)
   local directives = item.directives or ""
   sip.setDrawableIcon(w, item.path, item.icon, directives)
 end
 
+--- Clears the item selection.
+-- Does not unset the selected list item.
 function sip.clearPreview()
   widget.setItemSlotItem(sip.widgets.itemSlot, nil);
   widget.setText(sip.widgets.itemDescription, sip.lines.itemDetails)
@@ -204,48 +202,45 @@ function sip.clearPreview()
   sip.showSpecifications(nil)
 end
 
---[[
-  Sets a classic drawable formatted image or regular image on the given widget.
-  @param wid - Image widget to apply the drawable to.
-  @param path - Item path.
-  @param drawable - Single drawable object or image path. Only the image parameter is used.
-    Image path can be relative or absolute. All below arguments are valid.
-    path "/" drawable "assetMissing.png" || path "/" drawable "/assetMissing.png" || path "" drawable "/assetMissing.png"
-]]
+--- Sets a drawable or regular image on the given image widget.
+-- Drawable position is ignored.
+-- @param wid - Image widget to apply the drawable to.
+-- @param path - Item path.
+-- @param drawable - Single drawable object or image path. Only the image parameter is used.
+--  Image path can be relative or absolute. All below arguments will work.
+--  path "/" drawable "assetMissing.png" || path "/" drawable "/assetMissing.png" || path "" drawable "/assetMissing.png"
 function sip.setDrawableIcon(wid, path, drawable, directives)
-  local image = drawable and drawable.image or drawable or "/assetMissing.png"
-
+  local image = type(drawable) == "table" and drawable.image or drawable or "/assetMissing.png"
   if image:find("/") == 1 then path = "" end
   directives = directives or ""
-  if not pcall(root.imageSize,path .. image) then image = "/assetMissing.png"; path = "" end
   widget.setImage(wid, path .. image .. directives)
 end
 
---[[
-  Gets and uses the current filter text input to filter the item list.
-  Filtering checks item names and shortdescriptions case-insensitive.
-]]
-function sip.filter()
+--- Returns a value indicating whether the item list should be refreshed.
+-- The value indicates whether the search text has changed, by comparing the entered text to sip.previousSearch.
+-- sip.previousSearch should be updated before sip.showItems is called.
+-- @return True if the items should be refreshed, false otherwise.
+-- @see sip.previousSearch
+function sip.shouldFilter()
   local filter = widget.getText(sip.widgets.search)
-  if filter == sip.previousSearch then return end
-
-  sip.previousSearch = filter
-
-  sip.showItems()
+  return filter ~= sip.previousSearch
 end
 
---[[
-  Spawns the given item in the given quantity.
-  Does not check for validity.
-  @param itemName Identifier of the item to spawn.
-  @param itemConfig Full item configuration. Parameters are not used.
-  @param quantity Amount of items to spawn. Loops every 1000 to work around the engine's limit.
-]]
+--- Spawns the selected item in the given quantity.
+-- The item in the item slot is used.
+-- @param[opt] itemConfig Item configuration (root.itemConfig().config).
+-- @param[opt=1] quantity Amount of items to spawn. If maxStack = 1, then 1.
 function sip.spawnItem(itemConfig, quantity)
   quantity = quantity or 1
+  local item = widget.itemSlotItem(sip.widgets.itemSlot)
+
+  if not itemConfig then
+    itemConfig = root.itemConfig(item.name)
+    itemConfig = itemConfig and itemConfig.config or {}
+  end
+
   if itemConfig.maxStack == 1 then quantity = 1 end
 
-  local item = widget.itemSlotItem(sip.widgets.itemSlot)
   local maxItem = {name=item.name, count=1000, parameters = item.parameters }
 
   local it, rest = math.floor(quantity / 1000), quantity % 1000
@@ -257,11 +252,11 @@ function sip.spawnItem(itemConfig, quantity)
   if item.count > 0 then
     player.giveItem(item)
   end
-
-  -- Refresh
-  sip.randomizeItem()
 end
 
+--- Randomizes the item slot item.
+-- The selected details are used when randomizing (level/color/element).
+-- @see sip.getSpawnItemParameters
 function sip.randomizeItem()
   if sip.item then
     local params = sip.getSpawnItemParameters(root.itemConfig(sip.item.name).config)
@@ -291,39 +286,25 @@ function sip.getSelectedItem()
   return item or sip.item
 end
 
---[[
-  Shows or hides the category display.
-  @param bool - Value indicating whether to show (true) or hide (false) the categories.
-]]
+--- Shows or hides the category display.
+-- @param bool - Value indicating whether to show the categories.
 function sip.showCategories(bool)
   widget.setVisible(sip.widgets.categoryBackground, bool)
   widget.setVisible(sip.widgets.categoryScrollArea, bool)
 end
 
---[[
-  Returns the currently selected category widget and data, or nil, by checking the
-  dimensions of an invisible image widget that's used to keep track of the selection.
-  This is necessary due to the currently/previously broken widget.getSelectedOption callback.
-  Size[1] > Selected (1 = true, not 1 = false), defaults at image width which is 64.
-    Unless this value is 1, we're selecting a category, and the selection can be ignored.
-  Size[2] > Selection
-    Matches the widget name / index of the selected radioGroup button. Only matters if Selected is true.
-  @return - The widget name / index of the selected category button, or nil if no category is selected.
-  @return - The widget data of the selected category button, or nil if no category is selected.
-  ]]
+--- Returns the currently selected category widget and data
+-- @return The selected widget name (index), the widget data (categories).
 function sip.getSelectedCategory()
-  local index = widget.getSize("sipCategoryIndex")
-  if index[1] ~= 1 then return nil end
-  return index[2], widget.getData("sipCategoryScroll.sipCategoryGroup." .. index[2])
+  local opt = widget.getSelectedOption("sipCategoryScroll.sipCategoryGroup")
+  return opt, widget.getData("sipCategoryScroll.sipCategoryGroup." .. opt)
 end
 
---[[
-  Returns the currently selected quantity of items to print. Errors if quantity somehow ends up not being a number.
-  @return - Quantity of item to print.
-]]
+-- Returns the currently selected quantity of items to print, or 1.
+-- @return - Quantity of item to print.
+-- @see sip.quantity
 function sip.getQuantity()
-  if type(sip.quantity) ~= "number" then error("SIP: Quantity is stored incorrectly. Please contact the mod author.") end
-  return sip.quantity
+  return sip.quantity or 1
 end
 
 --- Set item quantity.
@@ -342,85 +323,16 @@ function sip.adjustQuantity(amnt)
   sip.setQuantity(sip.getQuantity() + amnt)
 end
 
--- Widget Callbacks --
-----------------------
-
---- Reset search timer.
--- Each update searchTick is lowered by one. When this value reaches 0, the list will be filtered.
--- @see update
-function sip.search()
-  sip.searchTick = sip.searchDelay
-  sip.searched = false
-end
-
---- Show or hide category panel.
-function sip.changeCategory()
-  sip.changingCategory = not sip.changingCategory
-  sip.showCategories(sip.changingCategory)
-end
-
---- Shows items for a category.
--- @param w Widget name. Used to determine index.
--- @param category Category to select, structured "category" or ["category", "category2"].
-function sip.selectCategory(w, category)
-  local index = widget.getSize("sipCategoryIndex")
-  local selecting = index[1] == 0
-  local selected = index[2]
-  local newSelection = tonumber(w)
-
-  if selecting or newSelection ~= selected then
-    widget.setSize("sipCategoryIndex", {1, newSelection})
-    sip.showItems(category)
-  else
-    widget.setSize("sipCategoryIndex", {0, -1})
-    sip.categories = nil
-    sip.showItems(false)
-  end
-end
-
---- Displays item information and options.
--- Shows option containers based on item type (weapon, clothing).
-function sip.selectItem()
-  sip.item = sip.getSelectedItem()
-
-  local config
-  if sip.item then config = root.itemConfig(sip.item.name).config else return end
-
-  -- Hide category overlay
-  sip.changingCategory = false
-  sip.showCategories(false)
-
-  -- Show text
-  widget.setText(sip.widgets.itemName, config.shortdescription or sip.item.name)
-  widget.setText(sip.widgets.itemDescription, config.description or sip.lines.descriptionMissing)
-
-  -- Rarity
-  local rarity = sip.item.rarity and sip.item.rarity:lower() or "common"
-  widget.setImage(sip.widgets.itemRarity, sip.rarities[rarity .. "Flag"])
-
-  -- Item slot
-  sip.randomizeItem()
-  sip.showSpecifications(config)
-end
-
---- Adjusts item quantity.
---  Parses widget data. If this is a number, adjust quantity by it.
--- If this is not a number, fetch quantity from the text field instead.
-function sip.changeQuantity(_, data)
-  if type(data) == "number" then
-    sip.adjustQuantity(data)
-  else
-    local str = widget.getText(sip.widgets.quantity):gsub("x","")
-    local n = tonumber(str)
-    if n then sip.setQuantity(n) end
-  end
-end
-
+--- Shows widgets depending on the given item config.
+-- If the item can be dyed, show dye options. If the item can be leveled, show
+-- the level and element options. If the item has a builderConfig, allow randomizing.
+-- @param itemConfig Item configuration (root.itemConfig().config).
 function sip.showSpecifications(itemConfig)
   local pane = nil
 
   local levelable = sip_util.isLevelableWeapon(itemConfig)
 
+  -- Clothing or weapon?
   if sip_util.isColorable(itemConfig) then
     pane = sip.widgets.specificationPanes.clothingPane
     sip.showClothingColors(itemConfig)
@@ -441,40 +353,24 @@ function sip.showSpecifications(itemConfig)
     sip.weaponLevel = sip.getWeaponLevel()
   end
 
+  -- Show the proper pane and hide other panes.
   for _,v in pairs(sip.widgets.specificationPanes) do
     widget.setVisible(v, pane == v)
   end
 end
 
---- Changes the weapon level.
--- Parses widget data. If this is a number, adjust weapon level by it.
--- If this is not a number, fetch quantity from the text field instead.
--- Value is clamped between 1 and 10.
-function sip.changeWeaponLevel(_, data)
-  local level = 1
-  if type(data) == "number" then
-    level = (sip.weaponLevel or 1) + data
-  else
-    local n = sip.getWeaponLevel()
-    if n then
-      level = n
-    else return end
-  end
-
-  sip.weaponLevel = math.clamp(level, 1, 10)
-  widget.setText(sip.widgets.weaponLevel, tostring(sip.weaponLevel))
-  sip.randomizeItem()
-end
-
+--- Returns the selected weapon level.
+-- If no level is entered, returns 1.
+-- @return Weapon level, always a number.
 function sip.getWeaponLevel()
   local str = widget.getText(sip.widgets.weaponLevel)
   return tonumber(str) or 1
 end
 
-function sip.selectWeaponElement(_, data)
-  sip.randomizeItem()
-end
-
+--- Show weapon elements allowed in the given item config.
+-- Parameters elementalType or builderConfig[n].elementalType are used to determine
+-- what elements are allowed for the given item.
+-- @param itemConfig Item configuration (root.itemConfig().config).
 function sip.showWeaponElements(itemConfig)
   local c = itemConfig
   if c.elementalType then
@@ -494,6 +390,10 @@ function sip.showWeaponElements(itemConfig)
   end
 end
 
+--- Enables buttons for the given weapon elements.
+-- Elements not in the collection can't be selected by the user.
+-- The previous selection will be cleared.
+-- @param elements Array or set of elements, or nil for no elements.
 function sip.enableWeaponElements(elements)
   elements = type(elements) == "table" and elements or
              type(elements) == "string" and { [elements] = true } or
@@ -506,6 +406,8 @@ function sip.enableWeaponElements(elements)
   widget.setSelectedOption(sip.widgets.weaponElement, -1)
 end
 
+--- Returns the selected weapon element, if any.
+-- @return Weapon element name, or nil.
 function sip.getWeaponElement()
   local index = widget.getSelectedOption(sip.widgets.weaponElement)
   local d = widget.getData(sip.widgets.weaponElement .. "." .. index)
@@ -538,57 +440,4 @@ function sip.showClothingColors(itemConfig)
 
   widget.setSelectedOption("paneClothing.clothingColor", 0)
   sip.colorOption = 0
-end
-
---- Selects a color option.
--- The selection option (index) is used by printed items.
--- @param _
--- @param data Color option index (starting at 1).
-function sip.selectClothingColor(_, data)
-  if data then
-    sip.colorOption = data
-    sip.randomizeItem()
-  end
-end
-
---- Spawns the current quantity of the current item.
--- If the max stack size of the item is 1, spawn 1 instead.
--- Logs an error if this item could not be spawned, by checking if it has an item configuration.
-function sip.print()
-  local item, q = sip.item, sip.getQuantity()
-  if not item or not item.name then return end
-
-  local cfg = root.itemConfig(item.name)
-
-  sip.spawnItem(cfg.config, q)
-end
-
-function sip.takeItem()
-  if not player.swapSlotItem() then
-    local item = widget.itemSlotItem(sip.widgets.itemSlot)
-    player.setSwapSlotItem(item)
-    sip.randomizeItem()
-  end
-end
-
---- Shows all item of the given type.
--- @param _
--- @param t Widget data representing the type to show. Should be items or objects
-function sip.showType(_, t)
-  if type(t) ~= "string" then error("SIP: Attempted to run sip.showType with a value other than a string.") end
-  if not sip.knownCategories[t] then sb.logError("SIP: Could now show items for the type '%s'.", t) return end
-  sip.showItems(sip.knownCategories[t])
-
-  widget.setSelectedOption(sip.widgets.categoryGroup, -1)
-end
-
---- Changes item pages.
--- NOT IMPLEMENTED
--- Widget callback function. Used to scroll between item pages when there's a set limit on the amount
--- of items displayed per page, and the amount of items to be listed exceeds this number.
--- @param _
--- @param data Widget data. -2 = First page. -1 = Previous page. 1 = Next page. 2 = Last page
-function sip.changePage(_, data)
-  -- TODO: Remove or implement pages and displaying of items per page. Performance seems decent enough not to require pages.
-  -- Could be used at some point when the game or mods add so many items that performance destabilizes.
 end
