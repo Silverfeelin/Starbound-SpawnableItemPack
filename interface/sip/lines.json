@@ -13,6 +13,9 @@
   "itemDetails" : "Please select an item to view it's details.",
   "noSelection" : "No item selected.",
 
+  "copiedItem" : "Copied Item",
+  "copy": "You can get more copies of this item by printing more below.",
+
   "specifications": "Specifications",
   "level" : "Level",
   "element" : "Element",

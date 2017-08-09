@@ -8,6 +8,17 @@ function sip.callback.search()
   sip.searched = false
 end
 
+--- Toggles a rarity filter.
+-- The item list is refreshed after the toggle.
+-- @param _
+-- @param rarity Lowercase rarity name.
+function sip.callback.toggleRarity(_, rarity)
+  sip.rarities[rarity] = not sip.rarities[rarity]
+  status.setStatusProperty("sip.rarities", sip.rarities)
+  sip.updateRarityFilters()
+  sip.showItems()
+end
+
 --- Show or hide category panel.
 function sip.callback.changeCategory()
   sip.changingCategory = not sip.changingCategory
@@ -46,7 +57,7 @@ function sip.callback.selectItem()
 
   -- Rarity
   local rarity = sip.item.rarity and sip.item.rarity:lower() or "common"
-  widget.setImage(sip.widgets.itemRarity, sip.rarities[rarity .. "Flag"])
+  widget.setImage(sip.widgets.itemRarity, sip.rarityImages.flags[rarity])
 
   -- Item slot
   sip.randomizeItem()
@@ -113,10 +124,28 @@ function sip.callback.print()
   sip.spawnItem(cfg.config, q)
 end
 
+--- Takes the item, or place an item to copy.
+-- If no item is held, the item will be taken (without consuming it). This acts similar to print, but only (x1).
+-- If an item is held, the selection is overwritten, allowing users to copy their existing items.
 function sip.callback.takeItem()
-  if not player.swapSlotItem() then
+  local swapItem = player.swapSlotItem()
+  if not swapItem then
+    -- Take the item
     local item = widget.itemSlotItem(sip.widgets.itemSlot)
     player.setSwapSlotItem(item)
+  else
+    -- Refresh to unselect previous item.
+    sip.showItems()
+
+    -- Place the item
+    swapItem.count = 1
+    sip.item = swapItem
+    sip.setItemSlotItem(sip.widgets.itemSlot, swapItem)
+    widget.setText(sip.widgets.itemDescription, sip.lines.copy)
+    widget.setText(sip.widgets.itemName, swapItem.parameters and swapItem.parameters.shortdescription or sip.lines.copiedItem)
+    widget.setImage(sip.widgets.itemRarity, sip.rarityImages.flags[swapItem.parameters and swapItem.parameters.rarity or "common"])
+
+    sip.showSpecifications(nil)
   end
 end
 
@@ -129,15 +158,4 @@ function sip.callback.showType(_, t)
   sip.showItems(sip.knownCategories[t])
 
   widget.setSelectedOption(sip.widgets.categoryGroup, -1)
-end
-
---- Changes item pages.
--- NOT IMPLEMENTED
--- Widget callback function. Used to scroll between item pages when there's a set limit on the amount
--- of items displayed per page, and the amount of items to be listed exceeds this number.
--- @param _
--- @param data Widget data. -2 = First page. -1 = Previous page. 1 = Next page. 2 = Last page
-function sip.callback.changePage(_, data)
-  -- TODO: Remove or implement pages and displaying of items per page. Performance seems decent enough not to require pages.
-  -- Could be used at some point when the game or mods add so many items that performance destabilizes.
 end

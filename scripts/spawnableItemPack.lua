@@ -11,7 +11,7 @@ require "/scripts/sip_callback.lua"
 --- (Event) Initializes SIP.
 function init()
   -- Image paths for rarity border (common) and flag (commonFlag).
-  sip.rarities = config.getParameter("assets.rarities")
+  sip.rarityImages = config.getParameter("assets.rarities")
   -- Widget paths.
   sip.widgets = config.getParameter("widgetNames")
   -- Categories
@@ -77,6 +77,10 @@ function init()
   sip.previousSearch = status.statusProperty("sip.previousSearch") or ""
   widget.setText("sipTextSearch", sip.previousSearch)
   sip.searched = true
+
+  -- Load previous rarities
+  sip.rarities = status.statusProperty("sip.rarities") or Set({"common", "uncommon", "rare", "legendary", "essential"})
+  sip.updateRarityFilters()
 
   -- Load previous category
   -- Uses index, which means that the wrong category may be selected after installing/uninstalling mods.
@@ -152,15 +156,18 @@ function sip.showItems(category)
   elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error("SIP: Attempted to search for invalid category.")
   elseif type(category) ~= "nil" then sip.categories = category end
 
+  -- Filter items
   local items = sip.items
   items = sip_util.filterByCategory(sip.items, sip.categories)
+  items = sip_util.filterByRarity(items, sip.rarities)
   items = sip_util.filterByText(items, sip.previousSearch)
 
+  -- Add filtered items
   for i,v in ipairs(items) do
     local li = widget.addListItem(sip.widgets.itemList)
     widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
     widget.setData(sip.widgets.itemList .. "." .. li, v)
-    widget.setImage(sip.widgets.itemList .. "." .. li .. ".itemRarity", sip.rarities[v.rarity])
+    widget.setImage(sip.widgets.itemList .. "." .. li .. ".itemRarity", sip.rarityImages.borders[v.rarity])
 
     sip.setListIcon(sip.widgets.itemList .. "." .. li .. ".itemIcon", v)
   end
@@ -197,7 +204,7 @@ function sip.clearPreview()
   widget.setItemSlotItem(sip.widgets.itemSlot, nil);
   widget.setText(sip.widgets.itemDescription, sip.lines.itemDetails)
   widget.setText(sip.widgets.itemName, sip.lines.noSelection)
-  widget.setImage(sip.widgets.itemRarity, sip.rarities["commonFlag"])
+  widget.setImage(sip.widgets.itemRarity, sip.rarityImages.flags["common"])
 
   sip.showSpecifications(nil)
 end
@@ -440,4 +447,17 @@ function sip.showClothingColors(itemConfig)
 
   widget.setSelectedOption("paneClothing.clothingColor", 0)
   sip.colorOption = 0
+end
+
+function sip.updateRarityFilters()
+  local r = { "common", "uncommon", "rare", "legendary", "essential" }
+  sip.rarities = sip.rarities or {}
+
+  for _,v in ipairs(r) do
+    local suffix = sip.rarities[v] and "" or "?brightness=-60"
+    widget.setButtonImages("rarityFrame." .. v, {
+      base = "/interface/sip/rarities/filters/" .. v .. ".png" .. suffix,
+      hover = "/interface/sip/rarities/filters/" .. v .. ".png?brightness=15" .. suffix
+    })
+  end
 end

@@ -68,6 +68,24 @@ function sip_util.filterByText(list, text)
   return results
 end
 
+function sip_util.filterByRarity(list, rarities)
+  if type(rarities) ~= "table" then error("SIP: Attempted to filter by invalid rarities.") end
+
+  if #rarities > 0 then
+    rarities = Set(rarities)
+  end
+
+  local results = {}
+  for _,v in pairs(list) do
+    local rarity = v.rarity and v.rarity:lower() or "common"
+    if rarities[rarity] then
+      table.insert(results, v)
+    end
+  end
+
+  return results
+end
+
 function sip_util.colorOptionDirectives(colorOption)
   if type(colorOption) ~= "table" then return "" end
 
