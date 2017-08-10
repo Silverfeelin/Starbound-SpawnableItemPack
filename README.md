@@ -27,8 +27,6 @@ Don't worry, the bundled [Quickbar Mini][qbm] mod ensures you still have access 
 ##### Using the interface
 After opening the interface, you will be presented with a list of items. Note that the interface may take a second or two to load, as the item lists are being populated when you open the interface.
 
-Also note that not every preview image may appear as expected. The preview images for a large number of animated objects and items will show all frames rather than one image. Finding a fix and applying it is planned.
-
 The functionality of the interface is shown in the below image.  
 You can only select one category at once. Deselecting the current category is possible.
 ![Interface](https://raw.githubusercontent.com/Silverfeelin/SpawnableItemPack/master/readme/sip.png "Interface")
@@ -38,8 +36,10 @@ You can only select one category at once. Deselecting the current category is po
 * Spawn any item in any quantity.
 * Filter items by categories.
 * Filter items by item identifiers or names.
-* Change settings such as the level of generated weapons in the advanced settings menu.
- * You can open this menu by selecting the cog in the top right corner of the interface.
+* Filter items by rarities.
+* Change settings such as the level of generated weapons.
+* Randomize generated items before spawning them.
+* Copy existing items by dragging them on the item slot.
 
 ## Potential Issues
 * Game updates that remove items may cause issues, as the mod uses it's own item dump to populate lists.
