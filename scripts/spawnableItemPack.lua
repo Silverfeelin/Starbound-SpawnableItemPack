@@ -147,55 +147,34 @@ end
 --- Shows items in a category.
 -- Populates the item list with items for the given category, the previous categories or all categories.
 -- Filters the list based on text input. Text filtering compares item shortdescription and item name with the input case-insensitive.
--- @param[opt] category String or array of strings representing categories.
---             With no argument supplied, uses the sip.categories value instead. If sip.categories is nil, displays all items filtered by text.
-function sip.showItems(category)
+function sip.showItems()
   widget.clearListItems(sip.widgets.itemList)
-
-  if type(category) == "boolean" and category == false then sip.categories = nil
-  elseif type(category) ~= "table" and type(category) ~= "string" and type(category) ~= "nil" then error("SIP: Attempted to search for invalid category.")
-  elseif type(category) ~= "nil" then sip.categories = category end
 
   -- Filter items
   local items = sip.items
-  items = sip_util.filterByCategory(sip.items, sip.categories)
+  items = sip_util.filterByCategory(items, sip.categories)
   items = sip_util.filterByRarity(items, sip.rarities)
   items = sip_util.filterByText(items, sip.previousSearch)
 
   -- Add filtered items
   for i,v in ipairs(items) do
-    local li = widget.addListItem(sip.widgets.itemList)
-    widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. v.shortdescription)
-    widget.setData(sip.widgets.itemList .. "." .. li, v)
-    widget.setImage(sip.widgets.itemList .. "." .. li .. ".itemRarity", sip.rarityImages.borders[v.rarity])
-
-    sip.setListIcon(sip.widgets.itemList .. "." .. li .. ".itemIcon", v)
+    sip.addItem(v)
   end
 
   sb.logInfo("SIP: Done adding %s items to the list!",  #items)
 end
 
---- Sets the item slot item.
--- @param w Item slot widget.
--- @param item Item descriptor or name.
--- @param[opt] params Item parameters.
-function sip.setItemSlotItem(w, item, params)
-  if not item then return end
+--- Adds a SIP item to the item list.
+-- @param item Item to add.
+function sip.addItem(item)
+  local li = widget.addListItem(sip.widgets.itemList)
 
-  if type(w) == "string" then
-    if type(item) == "string" then
-      item = {name=item, parameters = params}
-    end
-    widget.setItemSlotItem(w, item)
-  end
-end
+  widget.setData(sip.widgets.itemList .. "." .. li, item)
 
---- Sets the icon for a list items.
--- @param w Full widget path to the list item image widget.
--- @param item SIP item.
-function sip.setListIcon(w, item)
-  local directives = item.directives or ""
-  sip.setDrawableIcon(w, item.path, item.icon, directives)
+  local rarity = item.rarity or "common"
+  widget.setText(sip.widgets.itemList .. "." .. li .. ".itemName", "^shadow;^white;" .. item.shortdescription)
+  widget.setImage(sip.widgets.itemList .. "." .. li .. ".itemRarity", sip.rarityImages.borders[rarity] or sip.rarityImages.borders["common"])
+  sip.setListIcon(sip.widgets.itemList .. "." .. li .. ".itemIcon", item)
 end
 
 --- Clears the item selection.
@@ -207,6 +186,28 @@ function sip.clearPreview()
   widget.setImage(sip.widgets.itemRarity, sip.rarityImages.flags["common"])
 
   sip.showSpecifications(nil)
+end
+
+--- Sets the item slot item.
+-- @param w Item slot widget.
+-- @param item Item descriptor or name.
+-- @param[opt] params Item parameters.
+function sip.setItemSlotItem(w, item, params)
+  if not item or not w then return end
+
+  if type(item) == "string" then
+    item = {name=item, parameters = params}
+  end
+
+  widget.setItemSlotItem(w, item)
+end
+
+--- Sets the icon for a list items.
+-- @param w Full widget path to the list item image widget.
+-- @param item SIP item.
+function sip.setListIcon(w, item)
+  local directives = item.directives or ""
+  sip.setDrawableIcon(w, item.path, item.icon, directives)
 end
 
 --- Sets a drawable or regular image on the given image widget.
@@ -449,13 +450,15 @@ function sip.showClothingColors(itemConfig)
   sip.colorOption = 0
 end
 
+--- Updates the rarity filter button images.
+-- This will make active rarity buttons brighter than inactive ones.
 function sip.updateRarityFilters()
   local r = { "common", "uncommon", "rare", "legendary", "essential" }
   sip.rarities = sip.rarities or {}
 
   for _,v in ipairs(r) do
     local suffix = sip.rarities[v] and "" or "?brightness=-60"
-    widget.setButtonImages("rarityFrame." .. v, {
+    widget.setButtonImages("paneRarity." .. v, {
       base = "/interface/sip/rarities/filters/" .. v .. ".png" .. suffix,
       hover = "/interface/sip/rarities/filters/" .. v .. ".png?brightness=15" .. suffix
     })

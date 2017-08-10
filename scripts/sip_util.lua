@@ -1,5 +1,8 @@
 sip_util = {}
 
+--- Returns a value indicating whether an item has color options.
+-- @param itemConfig Item configuration (root.itemConfig().config).
+-- @return True if the item supports color options.
 function sip_util.isColorable(itemConfig)
   if itemConfig then
     return not not itemConfig.colorOptions
@@ -7,6 +10,10 @@ function sip_util.isColorable(itemConfig)
   return false
 end
 
+--- Returns a value indicating whether an item is a levelable weapon.
+-- TODO: More reliable way to determine if the item is a weapon.
+-- @param itemConfig Item configuration (root.itemConfig().config).
+-- @return True if the item is a levelable weapon.
 function sip_util.isLevelableWeapon(itemConfig)
   if itemConfig then
     if itemConfig.level and not itemConfig.colorOptions then
@@ -24,12 +31,11 @@ function sip_util.isLevelableWeapon(itemConfig)
   return false
 end
 
---[[
-  Filters the given item list by the given category/categories.
-  @param list - Item table, as stored in the item dump.
-  @param categories - String representing a category name, or a set of strings representing a collection of categories.
-    Items matching one or more category will pass this check.
-]]
+--- Filters the item list by categories.
+-- Categories are identified by name, and are case insensitive.
+-- @param list Item table, as stored in the item dump.
+-- @param categories Category name or table with category names.
+-- @return Filtered item list.
 function sip_util.filterByCategory(list, categories)
   if categories == nil then return list end
   if type(categories) == "string" then categories = { [categories] = true }
@@ -46,12 +52,11 @@ function sip_util.filterByCategory(list, categories)
   return results
 end
 
---[[
-  Filters the given item list by the given text. Both item names and shortdescriptions are checked.
-  Checking is case-insensitive.
-  @param list - Item table, as stored in the item dump.
-  @param text - Text to filter by.
-]]
+-- Filters the item list by text.
+-- Both item names and shortdescriptions are checked, case insensitive.
+-- @param list Item table, as stored in the item dump.
+-- @param text Text to filter by.
+-- @return Filtered item list.
 function sip_util.filterByText(list, text)
   if type(text) ~= "string" then error("SIP: Attempted to filter by invalid text.") end
   if text == "" then return list end
@@ -68,6 +73,10 @@ function sip_util.filterByText(list, text)
   return results
 end
 
+--- Filters the item list by rarity.
+-- @param list Item table, as stored in the item dump.
+-- @param rarities table with allowed rarities.
+-- @return Filtered item list.
 function sip_util.filterByRarity(list, rarities)
   if type(rarities) ~= "table" then error("SIP: Attempted to filter by invalid rarities.") end
 
@@ -86,6 +95,9 @@ function sip_util.filterByRarity(list, rarities)
   return results
 end
 
+--- Creates replace directives for the given color option.
+-- @param colorOption Hex color dictionary (from=to)
+-- @return Replace directives string.
 function sip_util.colorOptionDirectives(colorOption)
   if type(colorOption) ~= "table" then return "" end
 
@@ -97,42 +109,22 @@ function sip_util.colorOptionDirectives(colorOption)
   return dir
 end
 
---[[
-  Logs environmental functions, tables and nested functions.
-  Less important now that we have the Lua documentation, but still useful.
-]]
-function logENV()
-  for i,v in pairs(_ENV) do
-    if type(v) == "function" then
-      sb.logInfo("%s", i)
-    elseif type(v) == "table" then
-      for j,k in pairs(v) do
-        sb.logInfo("%s.%s (%s)", i, j, type(k))
-      end
-    end
-  end
-end
-
 if not math then math = {} end
 
---[[
-  Clamps and returns a value between the minimum and maximum value.
-  @param i - Value to clamp.
-  @param low - Minimum bound (inclusive).
-  @param high - Maximum bound (inclusive).
-  @return - low when i<low, high when i>high, or i.
-]]
+--- Clamps and returns a number between the minimum and maximum value.
+-- @param i Value to clamp.
+-- @param low Minimum bound (inclusive).
+-- @param high Maximum bound (inclusive).
+-- @return Clamped number.
 function math.clamp(i, low, high)
   if low > high then low, high = high, low end
   return math.min(high, math.max(low, i))
 end
 
---[[
-  Creates and returns a set for the given table, using the values of the table as keys.
-  @param list - Table containing string values.
-  @return - Set
-]]
---https://www.lua.org/pil/11.5.html
+-- Creates a set for the given table, using the values of the table as keys.
+-- https://www.lua.org/pil/11.5.html
+-- @param list Table containing string values.
+-- @return Set
 function Set(list)
   local set = {}
   for _, l in ipairs(list) do set[l] = true end

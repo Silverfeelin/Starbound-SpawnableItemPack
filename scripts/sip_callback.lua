@@ -32,10 +32,11 @@ function sip.callback.selectCategory(w, category)
   local cat, data = sip.getSelectedCategory()
   status.setStatusProperty("sip.selectedCategory", cat)
   if cat ~= -1 then
-    sip.showItems(category)
+    sip.categories = data
+    sip.showItems()
   else
     sip.categories = nil
-    sip.showItems(false)
+    sip.showItems()
   end
 end
 
@@ -155,7 +156,8 @@ end
 function sip.callback.showType(_, t)
   if type(t) ~= "string" then error("SIP: Attempted to run sip.showType with a value other than a string.") end
   if not sip.knownCategories[t] then sb.logError("SIP: Could now show items for the type '%s'.", t) return end
-  sip.showItems(sip.knownCategories[t])
+  sip.categories = sip.knownCategories[t]
+  sip.showItems()
 
   widget.setSelectedOption(sip.widgets.categoryGroup, -1)
 end

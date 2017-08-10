@@ -1,0 +1,7 @@
+Special thanks to:
+
+Volnues - Spriting
+NOICEMEMES - Physical Element
+
+And everyone who has reported issues or suggested new features and improvements!
+If your name is missing from the list, let me know in a PR/Issue.
