@@ -8,6 +8,12 @@ function sip.callback.search()
   sip.searched = false
 end
 
+--- Clears the text filter.
+function sip.callback.clearText()
+  widget.setText(sip.widgets.search, "")
+  sip.searchTick = 0 -- force update immediately (well, 1 frame)
+end
+
 --- Toggles a rarity filter.
 -- The item list is refreshed after the toggle.
 -- @param _
