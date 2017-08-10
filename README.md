@@ -10,7 +10,7 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 - [Contributing](#contributing)
 
 ## Installation
-* [Download](https://github.com/Silverfeelin/SpawnableItemPack/releases) the release for the current version of Starbound.
+* [Download](https://github.com/Silverfeelin/Starbound-SpawnableItemPack/releases) the release for the current version of Starbound.
 * Place the `SpawnableItemPack.pak` file in your mods folder (eg. `D:\Steam\steamapps\common\Starbound\mods\`). Overwrite the existing file if necessary.
 * Optionally, place the `QuickbarMini.pak` in the same mods folder. This step is necessary if you don't have the mod (or StardustLib) yet.
  * This file is included in the zipped release.
@@ -22,14 +22,14 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 
 Don't worry, the bundled [Quickbar Mini][qbm] mod ensures you still have access to the original functionality of the upgrade panel! This menu is used for the mod as it's multiplayer-friendly and can be accessed anywhere.
 
-![Open MMU](https://raw.githubusercontent.com/Silverfeelin/SpawnableItemPack/master/readme/openInterface.png "Open the matter manipulator upgrade panel")
+![Open MMU](https://raw.githubusercontent.com/Silverfeelin/Starbound-SpawnableItemPack/master/readme/openInterface.png "Open the matter manipulator upgrade panel")
 
 ##### Using the interface
 After opening the interface, you will be presented with a list of items. Note that the interface may take a second or two to load, as the item lists are being populated when you open the interface.
 
 The functionality of the interface is shown in the below image.  
 You can only select one category at once. Deselecting the current category is possible.
-![Interface](https://raw.githubusercontent.com/Silverfeelin/SpawnableItemPack/master/readme/sip.png "Interface")
+![Interface](https://raw.githubusercontent.com/Silverfeelin/Starbound-SpawnableItemPack/master/readme/sip.png "Interface")
 
 ## Features
 * View item information by selecting an item.
