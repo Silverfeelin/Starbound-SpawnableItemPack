@@ -53,7 +53,7 @@ function sip_util.filterByCategory(list, categories)
 end
 
 -- Filters the item list by text.
--- Both item names and shortdescriptions are checked, case insensitive.
+-- item name, shortdescription, race.
 -- @param list Item table, as stored in the item dump.
 -- @param text Text to filter by.
 -- @return Filtered item list.
@@ -65,7 +65,7 @@ function sip_util.filterByText(list, text)
 
   local results = {}
   for _,v in pairs(list) do
-    if v.shortdescription:lower():find(text) or v.name:lower():find(text) then
+    if v.shortdescription:lower():find(text) or v.name:lower():find(text) or v.race == text then
       table.insert(results, v)
     end
   end

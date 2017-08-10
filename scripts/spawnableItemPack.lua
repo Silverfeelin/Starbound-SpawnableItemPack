@@ -109,6 +109,11 @@ function sip.loadStaticText()
   widget.setText(sip.widgets.labelClothingColor, sip.lines.color)
 end
 
+--- Adds items from /sipMods/ to the item list.
+-- Items from configuration files added to load.config are added only if the first item is valid.
+-- Checking all items is very slow.
+-- @param itemList List to add the mod items to.
+-- @return Same item list (not a copy).
 function sip.loadModItems(itemList)
   itemList = itemList or {}
   for _,modFile in ipairs(root.assetJson("/sipMods/load.config")) do

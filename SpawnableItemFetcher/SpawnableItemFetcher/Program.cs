@@ -241,13 +241,21 @@ namespace SpawnableItemFetcher
             // Set icon
             newItem["icon"] = GetIcon(item, true);
 
-            // Set rarity. Use common if no rarity is set.
-            newItem["rarity"] = GetRarity(item);
+            // Set rarity.
+            string rarity = GetRarity(item);
+            if (rarity != null)
+                newItem["rarity"] = rarity;
+
+            // Set race
+            string race = GetRace(item);
+            if (race != null)
+                newItem["race"] = race;
 
             string directives = GetDirectives(item);
             if (!string.IsNullOrEmpty(directives))
                 newItem["directives"] = directives;
 
+            
             // Add the item.
             switch (resultType)
             {
@@ -412,6 +420,15 @@ namespace SpawnableItemFetcher
             JToken tkn = item["rarity"];
             if (tkn == null || tkn.Type != JTokenType.String)
                 return defaultRarity;
+
+            return tkn.Value<string>().ToLowerInvariant();
+        }
+        
+        static string GetRace(JObject item)
+        {
+            JToken tkn = item["race"];
+            if (tkn == null || tkn.Type != JTokenType.String)
+                return null;
 
             return tkn.Value<string>().ToLowerInvariant();
         }
