@@ -44,6 +44,9 @@ function init()
   sip.items = root.assetJson("/sipItemDump.json")
   sip.customItems = root.assetJson("/sipCustomItems.json")
 
+  sip.queuedItems = {}
+  sip.queueBuffer = status.statusProperty("sip.queueBuffer") or 50
+
   -- Simple check for the first custom item to exist. Will obviously not catch all missing items.
   -- If the first custom item does not exist, do not load /any/ custom items.
   if #sip.customItems == 0 then
@@ -129,7 +132,13 @@ end
 --- (Event) Updates SIP.
 -- Updates search timer. If timer expires, show filtered items.
 function update(dt)
-  -- Update search filter.
+  sip.searchUpdate()
+  sip.queuedItemUpdate()
+end
+
+--- Check if the item list should be filtered by entered text.
+-- If the text has been changed after the user stops typing for sip.searchDelay frames, refresh the item list.
+function sip.searchUpdate()
   if not sip.searched then
     sip.searchTick = sip.searchTick - 1
     if sip.searchTick <= 0 then
@@ -144,11 +153,43 @@ function update(dt)
   end
 end
 
+--- Add queued items. The amount of items to add is automatically adjusted.
+-- @see sip.queueBuffer
+function sip.queuedItemUpdate()
+  if next(sip.queuedItems) then
+    local c = #sip.queuedItems
+    if c > sip.queueBuffer then c = sip.queueBuffer end
+    local time = os.clock()
+
+    for i = 1, c do
+      sip.addItem(sip.queuedItems[1])
+      table.remove(sip.queuedItems, 1)
+    end
+
+    -- Adjust queue buffer based on time taken.
+    -- If adding the items took close to 1 frame, decrease the amount of items added per frame.
+    -- If adding the items took about half a frame, increase the amount of items adder per frame.
+    -- The buffer is serialized to provide the accurate buffer after the first run.
+    time = os.clock() - time
+    if time > 0.014 and sip.queueBuffer >= 20 then
+      sip.queueBuffer = sip.queueBuffer - 3
+    elseif time < 0.0075 then
+      sip.queueBuffer = sip.queueBuffer + 3
+    end
+  end
+end
+
+--- (Event) Uninitializes SIP
+function uninit()
+  status.setStatusProperty("sip.queueBuffer", sip.queueBuffer)
+end
+
 --- Shows items in a category.
 -- Populates the item list with items for the given category, the previous categories or all categories.
 -- Filters the list based on text input. Text filtering compares item shortdescription and item name with the input case-insensitive.
 function sip.showItems()
   widget.clearListItems(sip.widgets.itemList)
+  sip.queuedItems = {}
 
   -- Filter items
   local items = sip.items
@@ -158,10 +199,17 @@ function sip.showItems()
 
   -- Add filtered items
   for i,v in ipairs(items) do
-    sip.addItem(v)
+    sip.queueItem(v)
   end
 
-  sb.logInfo("SIP: Done adding %s items to the list!",  #items)
+  sb.logInfo("SIP: Started adding %s items to the list!",  #items)
+end
+
+--- Queues an item to be added to the item list.
+-- @param item Item to add.
+-- @see update Adds the queued items over time.
+function sip.queueItem(item)
+  table.insert(sip.queuedItems, item)
 end
 
 --- Adds a SIP item to the item list.
