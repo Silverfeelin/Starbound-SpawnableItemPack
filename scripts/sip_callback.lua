@@ -66,6 +66,9 @@ function sip.callback.selectItem()
   local rarity = sip.item.rarity and sip.item.rarity:lower() or "common"
   widget.setImage(sip.widgets.itemRarity, sip.rarityImages.flags[rarity])
 
+  -- Blueprint
+  widget.setButtonEnabled(sip.widgets.blueprint, sip_util.hasBlueprint(sip.item.name))
+
   -- Item slot
   sip.randomizeItem()
   sip.showSpecifications(config)
@@ -129,6 +132,14 @@ function sip.callback.print()
   local cfg = root.itemConfig(item.name)
 
   sip.spawnItem(cfg.config, q)
+end
+
+--- Spawns a recipe for the current item, if the item supports a recipe.
+function sip.callback.printBlueprint()
+  local item = sip.item
+  if item and item.name and sip_util.hasBlueprint(item.name) then
+    player.giveItem({name=item.name .. "-recipe", count=1})
+  end
 end
 
 --- Takes the item, or place an item to copy.

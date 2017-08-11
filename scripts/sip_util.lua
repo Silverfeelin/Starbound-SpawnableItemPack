@@ -31,6 +31,12 @@ function sip_util.isLevelableWeapon(itemConfig)
   return false
 end
 
+--- Returns a value indicating whether the item has an unlockable blueprint
+function sip_util.hasBlueprint(itemName)
+  if type(itemName) ~= "string" then return false end
+  return not not root.itemConfig(itemName .. "-recipe")
+end
+
 --- Filters the item list by categories.
 -- Categories are identified by name, and are case insensitive.
 -- @param list Item table, as stored in the item dump.
