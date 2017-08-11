@@ -4,6 +4,7 @@ sip = spawnableItemPack
 
 -- Utility methods
 require "/scripts/sip_util.lua"
+require "/scripts/util.lua"
 
 -- Define callbacks
 require "/scripts/sip_callback.lua"
@@ -290,10 +291,16 @@ end
 --- Spawns the selected item in the given quantity.
 -- The item in the item slot is used.
 -- @param[opt] itemConfig Item configuration (root.itemConfig().config).
+-- Used for max stack and upgrade parameters.
 -- @param[opt=1] quantity Amount of items to spawn. If maxStack = 1, then 1.
-function sip.spawnItem(itemConfig, quantity)
+-- @param[opt=false] upgrade If true, merges the upgrade parameters on top of the item.
+function sip.spawnItem(itemConfig, quantity, upgrade)
   quantity = quantity or 1
   local item = widget.itemSlotItem(sip.widgets.itemSlot)
+
+  if upgrade then
+    sip_util.upgradeItem(item, itemConfig, sip.getWeaponLevel())
+  end
 
   if not itemConfig then
     itemConfig = root.itemConfig(item.name)
@@ -413,6 +420,11 @@ function sip.showSpecifications(itemConfig)
   elseif not sip.weaponLevel then
     sip.weaponLevel = sip.getWeaponLevel()
   end
+
+  -- Blueprint
+  widget.setButtonEnabled(sip.widgets.blueprint, itemConfig and sip_util.hasBlueprint(sip.item.name))
+  -- Upgrade
+  widget.setButtonEnabled(sip.widgets.upgrade, itemConfig and sip_util.isUpgradeable(itemConfig))
 
   -- Show the proper pane and hide other panes.
   for _,v in pairs(sip.widgets.specificationPanes) do

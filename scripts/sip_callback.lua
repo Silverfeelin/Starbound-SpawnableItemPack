@@ -66,9 +66,6 @@ function sip.callback.selectItem()
   local rarity = sip.item.rarity and sip.item.rarity:lower() or "common"
   widget.setImage(sip.widgets.itemRarity, sip.rarityImages.flags[rarity])
 
-  -- Blueprint
-  widget.setButtonEnabled(sip.widgets.blueprint, sip_util.hasBlueprint(sip.item.name))
-
   -- Item slot
   sip.randomizeItem()
   sip.showSpecifications(config)
@@ -132,6 +129,17 @@ function sip.callback.print()
   local cfg = root.itemConfig(item.name)
 
   sip.spawnItem(cfg.config, q)
+end
+
+--- Spawns the upgraded version of the item.
+function sip.callback.printUpgrade()
+  local item, q = sip.item, sip.getQuantity()
+  if not item or not item.name then return end
+
+  local cfg = root.itemConfig(item.name)
+  if not sip_util.isUpgradeable(cfg.config) then return end
+
+  sip.spawnItem(cfg.config, q, true)
 end
 
 --- Spawns a recipe for the current item, if the item supports a recipe.

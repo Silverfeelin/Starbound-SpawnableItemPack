@@ -1,3 +1,5 @@
+require "/scripts/util.lua"
+
 sip_util = {}
 
 --- Returns a value indicating whether an item has color options.
@@ -32,9 +34,40 @@ function sip_util.isLevelableWeapon(itemConfig)
 end
 
 --- Returns a value indicating whether the item has an unlockable blueprint
+-- @param itemName Name of the item.
+-- @return True if the
 function sip_util.hasBlueprint(itemName)
   if type(itemName) ~= "string" then return false end
   return not not root.itemConfig(itemName .. "-recipe")
+end
+
+--- Returns a value indicating whether the item can be upgraded.
+-- @param itemConfig Item configuration(root.itemConfig().config).
+-- @return True if the item can be upgraded.
+function sip_util.isUpgradeable(itemConfig)
+  if not itemConfig then return false end
+  return not not itemConfig.upgradeParameters
+end
+
+
+--- Upgrades item by merging the upgrade parameters from the item config.
+-- If the item can't be upgraded, only the level will be upgraded.
+-- @param item Item descriptor to upgrade. Object is directly modified.
+-- @param itemConfig Item configuration (root.itemConfig().config).
+-- @param[opt=6] level Item level.
+function sip_util.upgradeItem(item, itemConfig, level)
+  if not item or not itemConfig then return end
+  level = type(level) == "number" and level or 6
+  item.parameters = item.parameters or {}
+
+  -- Merge upgrade
+  local u = itemConfig.upgradeParameters
+  if u then
+    item.parameters = util.mergeTable(item.parameters, u)
+  end
+
+  -- Force level
+  item.parameters.level = level
 end
 
 --- Filters the item list by categories.
