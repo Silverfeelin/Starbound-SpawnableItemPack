@@ -6,7 +6,7 @@ local categoryButtons = categoryGroup.buttons
 
 local modCategories = root.assetJson("/sipMods/categories.config")
 
-local x, y, i = 1, -372, 0
+local x, y, i = 1, -397, 0
 local buttonOffset = {37, -25}
 local labelOffset = {0, -8}
 

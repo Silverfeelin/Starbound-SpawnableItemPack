@@ -201,6 +201,12 @@ namespace SpawnableItemFetcher
         /// <param name="file">File to scan. Expected to be a JSON formatted item file.</param>
         static void AddItem(FileInfo file)
         {
+            if (file.Extension == ".codex")
+            {
+                AddCodex(file);
+                return;
+            }
+
             // Read file
             string content = File.ReadAllText(file.FullName);
 
@@ -268,7 +274,71 @@ namespace SpawnableItemFetcher
                     result.Add(newItem);
                     break;
             }
+        }
 
+        static void AddCodex(FileInfo file)
+        {
+            // Read file
+            string content = File.ReadAllText(file.FullName);
+
+            // Parse file
+            JObject item = null;
+            try
+            {
+                item = JObject.Parse(content);
+            }
+            catch
+            {
+                Console.WriteLine("Skipped '" + file.FullName + "', as it could not be parsed as a valid JSON file.");
+                return;
+            }
+
+            JObject newItem = new JObject();
+
+            newItem["path"] = AssetPath(file.FullName, basePath);
+            newItem["fileName"] = file.Name;
+
+            // Set item name
+            string name = GetCodexName(item);
+            newItem["name"] = name;
+
+            if (string.IsNullOrEmpty(name))
+                return;
+
+            // Set item description. Use item name if no description is set.
+            string shortDescription = GetCodexTitle(item);
+            if (string.IsNullOrEmpty(shortDescription))
+                shortDescription = name;
+            newItem["shortdescription"] = shortDescription;
+
+            // Set category
+            newItem["category"] = "codex";
+
+            // Set icon
+            newItem["icon"] = GetIcon(item, true);
+
+            // Set rarity.
+            string rarity = GetCodexRarity(item);
+            if (rarity != null)
+                newItem["rarity"] = rarity;
+
+            // Set race
+            string race = GetSpecies(item);
+            if (race != null)
+                newItem["race"] = race;
+            
+            // Add the item.
+            switch (resultType)
+            {
+                case ResultType.Patch:
+                    JObject patch = JObject.Parse("{'op':'add','path':'/-','value':{}}");
+                    patch["value"] = newItem;
+                    result.Add(patch);
+                    break;
+                case ResultType.Normal:
+                    result.Add(newItem);
+                    break;
+            }
         }
 
         static string GetItemName(JObject item)
@@ -284,9 +354,30 @@ namespace SpawnableItemFetcher
             return name?.Value<string>();
         }
 
+        static string GetCodexName(JObject item)
+        {
+            JToken name = item["id"];
+            if (name != null && name.Type == JTokenType.String)
+            {
+                return name.Value<string>() + "-codex";
+            }
+
+            return null;
+        }
+
         static string GetItemShortDescription(JObject item)
         {
             JToken tkn = item["shortdescription"];
+
+            if (tkn != null && tkn.Type != JTokenType.String)
+                return null;
+
+            return tkn?.Value<string>();
+        }
+
+        static string GetCodexTitle(JObject item)
+        {
+            JToken tkn = item["title"];
 
             if (tkn != null && tkn.Type != JTokenType.String)
                 return null;
@@ -424,9 +515,27 @@ namespace SpawnableItemFetcher
             return tkn.Value<string>().ToLowerInvariant();
         }
         
+        static string GetCodexRarity(JObject item, string defaultRarity = "common")
+        {
+            JToken tkn = item.SelectToken("itemConfig.rarity");
+            if (tkn == null || tkn.Type != JTokenType.String)
+                return defaultRarity;
+
+            return tkn.Value<string>().ToLowerInvariant();
+        }
+
         static string GetRace(JObject item)
         {
             JToken tkn = item["race"];
+            if (tkn == null || tkn.Type != JTokenType.String)
+                return null;
+
+            return tkn.Value<string>().ToLowerInvariant();
+        }
+
+        static string GetSpecies(JObject item)
+        {
+            JToken tkn = item["species"];
             if (tkn == null || tkn.Type != JTokenType.String)
                 return null;
 
