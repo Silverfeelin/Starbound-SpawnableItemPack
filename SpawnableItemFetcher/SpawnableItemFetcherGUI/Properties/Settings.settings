@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SpawnableItemFetcherGUI.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Extensions" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.activeitem;.object;.codex;.head;.chest;.legs;.back;.augment;.currency;.coinitem;.item;.consumable;.unlock;.instrument;.liqitem;.matitem;.thrownitem;.harvestingtool;.flashlight;.grapplinghook;.painttool;.wiretool;.beamaxe;.tillingtool;.miningtool;.techitem;.mechitem</Value>
+    </Setting>
+    <Setting Name="Blacklist" Type="System.String" Scope="User">
+      <Value Profile="(Default)">filledcapturepod;npcpetcapturepod</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

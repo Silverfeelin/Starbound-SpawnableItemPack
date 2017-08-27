@@ -11,10 +11,14 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-SpawnableItemFetcher/.vs
 **/packages/*
+
+SpawnableItemFetcher/.vs
 SpawnableItemFetcher/SpawnableItemFetcher/bin/*
 SpawnableItemFetcher/SpawnableItemFetcher/obj/*
 SpawnableItemFetcher/SpawnableItemFetcher/SpawnableItemFetcher.csproj.user
+SpawnableItemFetcher/SpawnableItemFetcherGUI/bin/*
+SpawnableItemFetcher/SpawnableItemFetcherGUI/obj/*
+SpawnableItemFetcher/SpawnableItemFetcherGUI/SpawnableItemFetcher.csproj.user
 
 .tags
