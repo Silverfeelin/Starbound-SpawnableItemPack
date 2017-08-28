@@ -9,6 +9,8 @@ If you want to add your own category buttons to the interface, please see [Addin
 * [Known Limitations](#known-limitations)
 * [Requirements](#requirements)
 * [Creating the Patch](#creating-the-patch)
+* [Settings](#settings)
+* [Result](#result)
 
 ### What it Does
 
