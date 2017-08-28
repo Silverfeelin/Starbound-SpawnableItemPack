@@ -44,7 +44,7 @@ You can find the tool in the [source code](https://github.com/Silverfeelin/Starb
 
 **<li>Unpacked Mod</li>**
 
-The mod you're trying to make a file for should be unpacked. If you have a packed mod, please [unpack it](http://community.playstarbound.com/threads/how-to-successfully-pack-and-unpack-pak-files.66649/) first.
+The mod you're trying to make a patch for should be unpacked. If you have a packed mod, please [unpack it](http://community.playstarbound.com/threads/how-to-successfully-pack-and-unpack-pak-files.66649/) first.
 
 On this page, Frackin' Universe is used as an example.  
 You can find Frackin' Universe by Sayter here: https://github.com/sayterdarkwynd/FrackinUniverse
