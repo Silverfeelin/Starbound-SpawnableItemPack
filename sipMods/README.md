@@ -12,6 +12,8 @@ If you want to add your own category buttons to the interface, please see [Addin
 * [Settings](#settings)
 * [Result](#result)
 
+---
+
 ### What it Does
 
 The Spawnable Item Fetcher is a tool that creates an item file containing all items and objects found in a mod or asset folder. This is necessary because there is currently no way to fetch the items from within the game.
@@ -24,9 +26,13 @@ When creating a patch, the tool creates or modifies the following files:
 | `/sipMods/load.json.patch` | This patch will tell SIP that it should load your item file. The entry is only added if it is not already present. |
 | `/sipMods/identifier.json` | This file contains all found items and objects. `identifier` will be replaced with the identifier you enter in the application.<br><b>It is important to keep the identifier the same for one mod, to avoid duplicate item files when updating.</b> |
 
+---
+
 ### Known Limitations
 
 * Duplicate items are not filtered out. If mods overwrite existing items (or items are also present in other mods), these items will be listed multiple times.
+
+---
 
 ### Requirements
 
@@ -42,6 +48,8 @@ The mod you're trying to make a file for should be unpacked. If you have a packe
 
 On this page, Frackin' Universe is used as an example.  
 You can find Frackin' Universe by Sayter here: https://github.com/sayterdarkwynd/FrackinUniverse
+
+---
 
 ### Creating the Patch
 
