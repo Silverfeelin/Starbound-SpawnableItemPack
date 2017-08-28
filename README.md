@@ -5,7 +5,7 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
-- [Adding Items](https://github.com/Silverfeelin/Starbound-SpawnableItemPack/wiki/Adding-Items)
+- [Adding Items](https://github.com/Silverfeelin/Starbound-SpawnableItemPack/blob/master/sipMods/README.md)
 - [Potential Issues](#potential-issues)
 - [Contributing](#contributing)
 
