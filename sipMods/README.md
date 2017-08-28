@@ -36,7 +36,7 @@ When creating a patch, the tool creates or modifies the following files:
 
 ### Requirements
 
-To make a patch file, you'll need the following:
+To get started, you'll need the following:
 
 **<li>Spawnable Item Fetcher</li>** *(Requires [.NET Framework 4.5](https://www.microsoft.com/en-us/download/details.aspx?id=30653), only tested on Windows 10)*
 
