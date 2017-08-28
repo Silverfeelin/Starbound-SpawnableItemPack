@@ -29,12 +29,12 @@
         private void InitializeComponent()
         {
             this.dgvExtensions = new System.Windows.Forms.DataGridView();
+            this.ColumnExtension = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnReset = new System.Windows.Forms.Button();
             this.dgvBlacklist = new System.Windows.Forms.DataGridView();
-            this.splitGridViews = new System.Windows.Forms.SplitContainer();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColumnExtension = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.splitGridViews = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(this.dgvExtensions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBlacklist)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitGridViews)).BeginInit();
@@ -60,13 +60,20 @@
             this.dgvExtensions.TabIndex = 0;
             this.dgvExtensions.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.CellBeginEdit_MarkChanged);
             // 
+            // ColumnExtension
+            // 
+            this.ColumnExtension.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.ColumnExtension.HeaderText = "File extensions";
+            this.ColumnExtension.Name = "ColumnExtension";
+            this.ColumnExtension.ToolTipText = "Files with matching extensions will be checked for items and objects.";
+            // 
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnSave.Location = new System.Drawing.Point(12, 529);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 1;
+            this.btnSave.TabIndex = 2;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.Save_Click);
@@ -77,7 +84,7 @@
             this.btnReset.Location = new System.Drawing.Point(164, 529);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
-            this.btnReset.TabIndex = 2;
+            this.btnReset.TabIndex = 3;
             this.btnReset.Text = "Reset";
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.Reset_Click);
@@ -96,8 +103,15 @@
             this.dgvBlacklist.MultiSelect = false;
             this.dgvBlacklist.Name = "dgvBlacklist";
             this.dgvBlacklist.Size = new System.Drawing.Size(227, 250);
-            this.dgvBlacklist.TabIndex = 3;
+            this.dgvBlacklist.TabIndex = 1;
             this.dgvBlacklist.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.CellBeginEdit_MarkChanged);
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewTextBoxColumn1.HeaderText = "Blacklisted items";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            this.dataGridViewTextBoxColumn1.ToolTipText = "Item identifiers in this list will be ignored.";
             // 
             // splitGridViews
             // 
@@ -118,20 +132,6 @@
             this.splitGridViews.Size = new System.Drawing.Size(227, 511);
             this.splitGridViews.SplitterDistance = 255;
             this.splitGridViews.TabIndex = 4;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewTextBoxColumn1.HeaderText = "Blacklisted items";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            this.dataGridViewTextBoxColumn1.ToolTipText = "Item identifiers in this list will be ignored.";
-            // 
-            // ColumnExtension
-            // 
-            this.ColumnExtension.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.ColumnExtension.HeaderText = "File extensions";
-            this.ColumnExtension.Name = "ColumnExtension";
-            this.ColumnExtension.ToolTipText = "Files with matching extensions will be checked for items and objects.";
             // 
             // ConfigurationForm
             // 

@@ -4,7 +4,6 @@ using System.Windows.Forms;
 using Ookii.Dialogs;
 using System.IO;
 using Newtonsoft.Json.Linq;
-using SpawnableItemFetcher;
 using System.Diagnostics;
 using System.Drawing;
 using System.Text.RegularExpressions;
@@ -81,6 +80,11 @@ namespace SpawnableItemFetcherGUI
         {
             CreatePatch();
         }
+        
+        private void CancelPatch_Click(object sender, EventArgs e)
+        {
+            CancelPatch();
+        }
 
         #endregion
 
@@ -138,20 +142,19 @@ namespace SpawnableItemFetcherGUI
         }
 
         /// <summary>
-        /// Big method that does everything that checks input, creates the patch and even adds SIP to the metadata includes parameter.
-        /// I know I know, bad code practices. ¯\_(ツ)_/¯
+        /// Tells the BackgroundWorker to create a patch if it's not already busy.
         /// </summary>
         private void CreatePatch()
         {
             if (!ValidInput())
             {
-                rtbxOutput.AppendTimestampText(Color.Red, "Please validate your input first!");
+                rtbxOutput.AppendTimestampText(Color.Red, "Please validate your input first!\n");
                 return;
             }
             
             if (worker.IsBusy)
             {
-                rtbxOutput.AppendTimestampText(Color.Red, "The worker is already busy!");
+                rtbxOutput.AppendTimestampText(Color.Red, "The worker is already busy!\n");
                 return;
             }
 
@@ -168,7 +171,7 @@ namespace SpawnableItemFetcherGUI
             if (basePath.LastIndexOf("\\") == basePath.Length - 1)
                 basePath = basePath.Substring(0, basePath.Length - 1);
 
-            rtbxOutput.AppendTimestampText(Color.Green, "Starting to fetch items. This may take a while.\nPlease do not worry if the progress bar seems stuck near the beginning. This means the application is busy locating all your item and object files.\n");
+            rtbxOutput.AppendTimestampText("Starting to fetch items. This may take a while.\nPlease do not worry if the progress bar seems stuck near the beginning. This means the application is busy locating all your item and object files.\n");
             
             worker_modFolder = modFolder;
             worker_targetFolder = outputFolder;
@@ -176,9 +179,23 @@ namespace SpawnableItemFetcherGUI
             worker_basePath = basePath;
             worker_extensions = Properties.Settings.Default.Extensions.Split(';');
 
+            prgPatching.Value = 0;
             worker.RunWorkerAsync();
         }
         
+        private void CancelPatch()
+        {
+            if (worker.IsBusy)
+            {
+                // Worker will say where it stopped.
+                worker.CancelAsync();
+            }
+            else
+            {
+                rtbxOutput.AppendText("There's no task to cancel!\n");
+            }
+        }
+
         #region Worker
 
         string worker_modFolder;
@@ -191,28 +208,38 @@ namespace SpawnableItemFetcherGUI
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             worker_items = new JArray();
-
-            // Patch load.json
-            Worker_CreatePatch(worker_modFolder, worker_targetFolder, worker_modIdentifier + ".json");
-            worker.ReportProgress(2);
-
-            // include SIP in metadata
-            Worker_PatchMetadata(worker_targetFolder);
-            worker.ReportProgress(4);
+            
+            // Create SIP folder.
+            Directory.CreateDirectory(Path.Combine(worker_targetFolder, "sipMods"));
 
             // Index files
+            // Because we don't know how many files there are, this step reports fake progress (0: 0%, 1000:  40%, >1000: 40%).
             List<FileInfo> files = new List<FileInfo>(100);
+
             foreach (FileInfo file in FindFiles(worker_modFolder, worker_extensions, true))
             {
                 files.Add(file);
+                
+                // Update UI from worker? I don't see why not.
+                if (files.Count % 100 == 0)
+                {
+                    Worker_AppendText("Indexed {0} files.\n", files.Count);
+                    int progress = (int)Math.Floor((files.Count < 1000 ? files.Count : 1000) / 1000d * 40);
+                    worker.ReportProgress(progress);
+                }
+
                 if (e.Cancel)
                 {
+                    Worker_AppendText("Cancelled after indexing {0} files.\n", files.Count);
                     return;
                 }
             }
-            worker.ReportProgress(25);
 
-            int beginProgress = 25, endProgress = 95;
+            Worker_AppendText("Indexed {0} files.\n", files.Count);
+            worker.ReportProgress(40);
+
+            // Scan files
+            int beginProgress = 40, endProgress = 90;
             int diffProgress = endProgress - beginProgress;
             int fileCount = files.Count, filesAdded = 0;
             // Read files
@@ -240,17 +267,21 @@ namespace SpawnableItemFetcherGUI
             // Create item file
             Worker_SaveItems(worker_items, worker_targetFolder, worker_modIdentifier);
 
+            // Patch load.json
+            Worker_CreatePatch(worker_modFolder, worker_targetFolder, worker_modIdentifier + ".json");
+            worker.ReportProgress(95);
+
+            // include SIP in metadata
+            Worker_PatchMetadata(worker_targetFolder);
+
             // Done
             worker.ReportProgress(100);
         }
 
         private void Worker_CreatePatch(string modFolder, string targetFolder, string itemFileName)
         {
-            string patchFile = Path.Combine(modFolder, "sipMods\\load.config.patch");
-
-            // Create SIP folder.
-            Directory.CreateDirectory(Path.Combine(targetFolder, "sipMods"));
-
+            string patchFile = Path.Combine(targetFolder, "sipMods\\load.config.patch");
+            
             JArray patch;
             // Create, update or leave alone the patch file.
             if (File.Exists(patchFile))
@@ -279,6 +310,7 @@ namespace SpawnableItemFetcherGUI
             patch.Add(patchObject);
 
             File.WriteAllText(patchFile, patch.ToString(Newtonsoft.Json.Formatting.Indented));
+            Worker_AppendText("Patched the SpawnableItemPack load.json to include {0}.json.\n", worker_modIdentifier);
         }
 
         private void Worker_PatchMetadata(string targetFolder)
@@ -287,9 +319,6 @@ namespace SpawnableItemFetcherGUI
             // Creates a new placeholder metadata if none exists.
             JObject metadata;
             string metadataFile = GetMetadataPath(targetFolder, true);
-
-            bool createIncludes = false;
-            bool metadataChanged = false, metadataCreated = false;
             
             metadata = JObject.Parse(File.ReadAllText(metadataFile));
 
@@ -317,6 +346,7 @@ namespace SpawnableItemFetcherGUI
             {
                 includes.Add("SpawnableItemPack");
                 File.WriteAllText(metadataFile, metadata.ToString(Newtonsoft.Json.Formatting.Indented));
+                Worker_AppendText("Added SpawnableItemPack to the metadata.\n");
             }
         }
 
@@ -327,7 +357,15 @@ namespace SpawnableItemFetcherGUI
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            rtbxOutput.AppendTimestampText(Color.Green, "A total of {0} items have been fetched! The mod folder has been opened for you.\n", worker_items.Count);
             Process.Start(worker_targetFolder);
+
+            worker_items = null;
+            worker_basePath = null;
+            worker_extensions = null;
+            worker_modIdentifier = null;
+            worker_targetFolder = null;
+            worker_modFolder = null;
         }
 
         private void Worker_AddItem(FileInfo file, JArray items)
@@ -443,6 +481,22 @@ namespace SpawnableItemFetcherGUI
             File.WriteAllText(path, items.ToString(Newtonsoft.Json.Formatting.None));
         }
 
+        private void Worker_AppendText(string text, params object[] args)
+        {
+            rtbxOutput.Invoke((MethodInvoker)delegate {
+                rtbxOutput.AppendTimestampText(text, args);
+                rtbxOutput.ScrollToCaret();
+            });
+        }
+
+        private void Worker_AppendText(Color color, string text, params object[] args)
+        {
+            rtbxOutput.Invoke((MethodInvoker)delegate {
+                rtbxOutput.AppendTimestampText(color, text, args);
+                rtbxOutput.ScrollToCaret();
+            });
+        }
+
         #endregion
         
         private IEnumerable<FileInfo> FindFiles(string path, string[] extensions, bool recursive = true)
@@ -509,6 +563,7 @@ namespace SpawnableItemFetcherGUI
             }
             else if (createIfNeeded)
             {
+                Worker_AppendText(Color.Red, "Created a placeholder metadata file to include SpawnableItemPack. Please update the file manually.\n");
                 File.WriteAllText(b, @"{""name"":""CHANGE_ME"",""includes"":[""SpawnableItemPack""]}");
                 return b;
             }

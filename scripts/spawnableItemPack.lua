@@ -121,13 +121,8 @@ function sip.loadModItems(itemList)
     local path = modFile:find("/") and modFile or ("/sipMods/" .. modFile)
     local items = root.assetJson(path)
     if #items > 0 then
-      if root.itemConfig(items[1].name) then
-        for i,v in ipairs(items) do
-          table.insert(itemList, v)
-        end
-        sb.logInfo("SIP: Added items from '%s'.", path)
-      else
-        sb.logInfo("SIP: Skipped items from '%s'. Please update the item file.", path)
+      for i,v in ipairs(items) do
+        table.insert(itemList, v)
       end
     end
   end

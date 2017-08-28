@@ -42,6 +42,7 @@
             this.rtbxOutput = new System.Windows.Forms.RichTextBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.prgPatching = new System.Windows.Forms.ProgressBar();
+            this.btnCancelPatch = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblModFolder
@@ -61,8 +62,9 @@
             this.tbxModFolder.Location = new System.Drawing.Point(78, 6);
             this.tbxModFolder.Name = "tbxModFolder";
             this.tbxModFolder.Size = new System.Drawing.Size(375, 20);
-            this.tbxModFolder.TabIndex = 1;
+            this.tbxModFolder.TabIndex = 0;
             this.toolTip.SetToolTip(this.tbxModFolder, "Please enter a valid mod folder path.");
+            this.tbxModFolder.Valid = false;
             this.tbxModFolder.TextChanged += new System.EventHandler(this.tbxModFolder_TextChanged);
             // 
             // btnBrowseModFolder
@@ -71,7 +73,7 @@
             this.btnBrowseModFolder.Location = new System.Drawing.Point(459, 6);
             this.btnBrowseModFolder.Name = "btnBrowseModFolder";
             this.btnBrowseModFolder.Size = new System.Drawing.Size(29, 20);
-            this.btnBrowseModFolder.TabIndex = 2;
+            this.btnBrowseModFolder.TabIndex = 1;
             this.btnBrowseModFolder.Text = "...";
             this.btnBrowseModFolder.UseVisualStyleBackColor = true;
             this.btnBrowseModFolder.Click += new System.EventHandler(this.BrowseModFolder_Click);
@@ -93,9 +95,10 @@
             this.tbxOutputFolder.Location = new System.Drawing.Point(89, 58);
             this.tbxOutputFolder.Name = "tbxOutputFolder";
             this.tbxOutputFolder.Size = new System.Drawing.Size(364, 20);
-            this.tbxOutputFolder.TabIndex = 4;
+            this.tbxOutputFolder.TabIndex = 3;
             this.toolTip.SetToolTip(this.tbxOutputFolder, "Please enter a valid output folder path. The folder must exist, but can be empty." +
         "");
+            this.tbxOutputFolder.Valid = false;
             this.tbxOutputFolder.TextChanged += new System.EventHandler(this.tbxOutputFolder_TextChanged);
             // 
             // btnBrowseOutputFolder
@@ -104,16 +107,18 @@
             this.btnBrowseOutputFolder.Location = new System.Drawing.Point(459, 58);
             this.btnBrowseOutputFolder.Name = "btnBrowseOutputFolder";
             this.btnBrowseOutputFolder.Size = new System.Drawing.Size(29, 20);
-            this.btnBrowseOutputFolder.TabIndex = 5;
+            this.btnBrowseOutputFolder.TabIndex = 4;
             this.btnBrowseOutputFolder.Text = "...";
             this.btnBrowseOutputFolder.UseVisualStyleBackColor = true;
             this.btnBrowseOutputFolder.Click += new System.EventHandler(this.BrowseOutputFolder_Click);
             // 
             // btnCreatePatch
             // 
+            this.btnCreatePatch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCreatePatch.Location = new System.Drawing.Point(12, 114);
             this.btnCreatePatch.Name = "btnCreatePatch";
-            this.btnCreatePatch.Size = new System.Drawing.Size(476, 24);
+            this.btnCreatePatch.Size = new System.Drawing.Size(362, 24);
             this.btnCreatePatch.TabIndex = 6;
             this.btnCreatePatch.Text = "Create patch";
             this.btnCreatePatch.UseVisualStyleBackColor = true;
@@ -127,9 +132,10 @@
             this.tbxModName.Location = new System.Drawing.Point(91, 32);
             this.tbxModName.Name = "tbxModName";
             this.tbxModName.Size = new System.Drawing.Size(397, 20);
-            this.tbxModName.TabIndex = 7;
+            this.tbxModName.TabIndex = 2;
             this.toolTip.SetToolTip(this.tbxModName, "Please enter an identifier for the mod. This will be used to name the item file.\r" +
         "\nDo not use any special characters other than underscores.");
+            this.tbxModName.Valid = false;
             this.tbxModName.TextChanged += new System.EventHandler(this.tbxModName_TextChanged);
             // 
             // lblModName
@@ -143,35 +149,54 @@
             // 
             // btnSettings
             // 
-            this.btnSettings.Location = new System.Drawing.Point(12, 84);
+            this.btnSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSettings.Location = new System.Drawing.Point(15, 84);
             this.btnSettings.Name = "btnSettings";
-            this.btnSettings.Size = new System.Drawing.Size(476, 24);
-            this.btnSettings.TabIndex = 10;
+            this.btnSettings.Size = new System.Drawing.Size(473, 24);
+            this.btnSettings.TabIndex = 5;
             this.btnSettings.Text = "Settings";
             this.btnSettings.UseVisualStyleBackColor = true;
             this.btnSettings.Click += new System.EventHandler(this.Settings_Click);
             // 
             // rtbxOutput
             // 
+            this.rtbxOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.rtbxOutput.Location = new System.Drawing.Point(12, 173);
             this.rtbxOutput.Name = "rtbxOutput";
             this.rtbxOutput.ReadOnly = true;
             this.rtbxOutput.Size = new System.Drawing.Size(476, 96);
-            this.rtbxOutput.TabIndex = 11;
+            this.rtbxOutput.TabIndex = 8;
             this.rtbxOutput.Text = "";
             // 
             // prgPatching
             // 
+            this.prgPatching.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.prgPatching.Location = new System.Drawing.Point(12, 144);
             this.prgPatching.Name = "prgPatching";
             this.prgPatching.Size = new System.Drawing.Size(476, 23);
-            this.prgPatching.TabIndex = 12;
+            this.prgPatching.TabIndex = 9;
+            // 
+            // btnCancelPatch
+            // 
+            this.btnCancelPatch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancelPatch.Location = new System.Drawing.Point(380, 114);
+            this.btnCancelPatch.Name = "btnCancelPatch";
+            this.btnCancelPatch.Size = new System.Drawing.Size(108, 24);
+            this.btnCancelPatch.TabIndex = 7;
+            this.btnCancelPatch.Text = "Cancel";
+            this.btnCancelPatch.UseVisualStyleBackColor = true;
+            this.btnCancelPatch.Click += new System.EventHandler(this.CancelPatch_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(500, 281);
+            this.Controls.Add(this.btnCancelPatch);
             this.Controls.Add(this.prgPatching);
             this.Controls.Add(this.rtbxOutput);
             this.Controls.Add(this.btnSettings);
@@ -206,6 +231,7 @@
         private System.Windows.Forms.RichTextBox rtbxOutput;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.ProgressBar prgPatching;
+        private System.Windows.Forms.Button btnCancelPatch;
     }
 }
 

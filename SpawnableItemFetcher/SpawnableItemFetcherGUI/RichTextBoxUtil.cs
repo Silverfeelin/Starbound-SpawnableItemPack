@@ -18,6 +18,7 @@ namespace SpawnableItemFetcherGUI
         public static void AppendTimestampText(this RichTextBox box, string text, params object[] args)
         {
             box.AppendText(GetTimestamp() + " " + string.Format(text, args));
+            box.ScrollToCaret();
         }
 
         public static void AppendTimestampText(this RichTextBox box, Color color, string text, params object[] args)
@@ -28,6 +29,7 @@ namespace SpawnableItemFetcherGUI
         public static void AppendText(this RichTextBox box, string text, params object[] args)
         {
             box.AppendText(string.Format(text, args));
+            box.ScrollToCaret();
         }
 
         public static void AppendText(this RichTextBox box, Color color, string text, params object[] args)
