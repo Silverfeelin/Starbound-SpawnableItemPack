@@ -104,7 +104,7 @@ function sip_util.filterByText(list, text)
 
   local results = {}
   for _,v in pairs(list) do
-    if v.shortdescription:lower():find(text) or v.name:lower():find(text) or v.race == text then
+    if v.shortdescription:lower():find(text, 1, true) or v.name:lower():find(text, 1, true) or v.race == text then
       table.insert(results, v)
     end
   end
