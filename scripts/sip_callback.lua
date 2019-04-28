@@ -190,3 +190,23 @@ function sip.callback.showType(_, t)
 
   widget.setSelectedOption(sip.widgets.categoryGroup, -1)
 end
+
+function sip.callback.openEditor()
+  if not sip.editor then return end
+  --Get the item from the itemSlot
+  local itemSlot = widget.itemSlotItem(sip.widgets.itemSlot)
+  if not itemSlot then return end
+  --loads the api
+  if not itemeditork then
+    pcall(require, "/api/itemeditork.lua")
+  end
+
+  --Get Quantity
+  local quantity = sip.getQuantity() or 1
+  itemConfig = root.itemConfig(itemSlot.name).config or {}
+	if itemConfig.maxStack and itemConfig.maxStack < quantity then quantity = itemConfig.maxStack end
+
+  --Open interface
+  local finalItem = {name=itemSlot.name, count=quantity, parameters = itemSlot.parameters }
+	itemeditork.open(finalItem)
+end
