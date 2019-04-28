@@ -23,6 +23,10 @@ function init()
   sip.defaultColorButtonImages = config.getParameter("colorButtonImages")
   sip.defaultPressedColorButtonImages = config.getParameter("pressedColorButtonImages")
 
+  -- Is Rexmeck's Item Editor loaded?
+  sip.editor = config.getParameter("itemEditor")
+  widget.setVisible(sip.widgets.editor, not not sip.editor)
+
   -- Some translatable keys. I'm probably going to remove all only used for logging messages at some point.
   sip.lines = root.assetJson("/interface/sip/lines.json")
   sip.loadStaticText()
