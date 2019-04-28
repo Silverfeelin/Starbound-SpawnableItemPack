@@ -108,6 +108,10 @@ function sip.callback.selectWeaponElement(_, data)
   sip.randomizeItem()
 end
 
+function sip.callback.randomizeItem()
+  sip.randomizeItem()
+end
+
 --- Selects a color option.
 -- The selection option (index) is used by printed items.
 -- @param _
