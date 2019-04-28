@@ -2,6 +2,7 @@ Special thanks to:
 
 Volnues - Spriting (background, printer, categories, rarities)
 NOICEMEMES - Spriting (physical element)
+Rexmeck - Compatibility with Rexmeck's Item Editor Pro
 
 And everyone who has reported issues or suggested new features and improvements!
 If your name is missing from the list, let me know in a PR/Issue.
