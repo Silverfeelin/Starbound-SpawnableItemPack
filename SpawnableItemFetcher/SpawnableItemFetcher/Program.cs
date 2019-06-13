@@ -234,6 +234,10 @@ namespace SpawnableItemFetcher
             if (string.IsNullOrEmpty(name))
                 return;
 
+            // Skip objects with no item variant.
+            if (item.Value<bool?>("hasObjectItem") == false)
+                return;
+
             // Set item description. Use item name if no description is set.
             string shortDescription = ItemReader.GetShortDescription(item);
             if (string.IsNullOrEmpty(shortDescription))
