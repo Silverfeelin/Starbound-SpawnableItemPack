@@ -1,11 +1,12 @@
 [
   {
     "op": "add",
-    "path": "/normal/-",
+    "path": "/items/silverfeelin:spawnableItemPack",
     "value": {
       "label": "Spawnable Item Pack",
-      "scriptAction": "spawnableItemPackLoader:openInterface",
-      "icon": "/interface/sip/iconSmall.png"
+      "icon": "/interface/sip/iconSmall.png",
+      "weight": 0,
+      "action": [ "exec", "/quickbar/spawnableItemPackLoader.lua" ]
     }
   }
 ]

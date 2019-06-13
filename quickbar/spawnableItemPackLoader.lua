@@ -63,6 +63,5 @@ end
 -- Position anchor at bottom (prevents last row from missing)
 categoryScroll.children.sipCatoryAnchor2.position[2] = y - 1
 
-function module.openInterface()
-  player.interact("ScriptPane", config)
-end
+-- Open interface
+player.interact("ScriptPane", config)
