@@ -528,3 +528,9 @@ function sip.updateRarityFilters()
     })
   end
 end
+
+function itemTooltip()
+  local item = sip.getSelectedItem()
+  if not item or not item.name or item.name == "" then return "" end
+  return string.format("^gray;Item identifier\n^white;%s", item.name)
+end
