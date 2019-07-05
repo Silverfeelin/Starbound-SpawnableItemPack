@@ -2,13 +2,11 @@
   "author" : "Silverfeelin",
   "description" : "Allows you to spawn any item in the game for free, straight from your Matter Manipulator Upgrade Panel.\n\nFor usage instructions, see: ^#61b3de;https://github.com/Silverfeelin/SpawnableItemPack^reset;",
   "friendlyName" : "Spawnable Item Pack",
+  "includes" : ["QuickbarMini", "StardustLib"],
+  "link" : "steam://url/CommunityFilePage/733665104",
   "name" : "SpawnableItemPack",
   "priority" : -1,
-  "includes" : [
-    "QuickbarMini",
-    "StardustLib"
-  ],
-  "version" : "1.4.3",
-  "link" : "steam://url/CommunityFilePage/733665104",
-  "steamContentId" : "733665104"
+  "steamContentId" : "733665104",
+  "tags" : "Crafting and Building|Cheats and God Items|User Interface|In-Game Tools",
+  "version" : "1.4.3"
 }
