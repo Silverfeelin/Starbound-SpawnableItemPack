@@ -6,8 +6,6 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
 - [Usage](#usage)
 - [Features](#features)
 - [Adding Items](https://github.com/Silverfeelin/Starbound-SpawnableItemPack/blob/master/sipMods/README.md)
-- [Potential Issues](#potential-issues)
-- [Contributing](#contributing)
 
 ## Installation
 * [Download](https://github.com/Silverfeelin/Starbound-SpawnableItemPack/releases) the release for the current version of Starbound.
@@ -34,20 +32,13 @@ You can only select one category at once. Deselecting the current category is po
 ## Features
 * View item information by selecting an item.
 * Spawn any item in any quantity.
-* Filter items by categories.
-* Filter items by item identifiers or names.
-* Filter items by rarities.
+* Filter items by name, categories and rarities.
 * Change settings such as the level of generated weapons.
 * Randomize generated items before spawning them.
 * Copy existing items by dragging them on the item slot.
 
-## Potential Issues
-* Game updates that remove items may cause issues, as the mod uses it's own item dump to populate lists.
-* Game updates that add items requires an update to the item dump to show in SIP.
-
-## Contributing
-If you have any suggestions or feedback that might help improve this mod, please do post them [on the discussion page](http://community.playstarbound.com/resources/spawnable-item-pack-spawn-all-items-for-free.515/)!
-You can also create pull requests and contribute directly to the mod!
+## Things to note
+* Game updates that add or remove items may cause issues, as the mod uses its own item file.
 
 [qbm]:(https://github.com/Silverfeelin/Starbound-Quickbar-Mini)
 [qbmRelease]:(https://github.com/Silverfeelin/Starbound-Quickbar-Mini/releases)
