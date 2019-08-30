@@ -14,11 +14,10 @@ Spawnable Item Pack (SIP) is an interface mod that allows you to spawn any item 
  * This file is included in the zipped release.
 
 ## Usage
-##### Opening the interface
-* Open the matter manipulator upgrade panel.
-* Select 'Open Spawnable Item Pack' from the available options.
 
-Don't worry, the bundled [Quickbar Mini][qbm] mod ensures you still have access to the original functionality of the upgrade panel! This menu is used for the mod as it's multiplayer-friendly and can be accessed anywhere.
+##### Opening the interface
+* Open the Quickbar.
+* Select 'Spawnable Item Pack' from the available options.
 
 ![Open MMU](https://raw.githubusercontent.com/Silverfeelin/Starbound-SpawnableItemPack/master/readme/openInterface.png "Open the matter manipulator upgrade panel")
 
