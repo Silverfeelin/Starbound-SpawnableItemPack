@@ -48,6 +48,7 @@ function init()
   -- Item collections
   sip.items = root.assetJson("/sipItemDump.json")
   sip.customItems = root.assetJson("/sipCustomItems.json")
+  sip.dynamicItems = root.assetJson("/sipDynamicItemDump.json")
 
   sip.queuedItems = {}
   sip.queueBuffer = status.statusProperty("sip.queueBuffer") or 50
@@ -73,6 +74,7 @@ function init()
   end
 
   sip.loadModItems(sip.items)
+  sip.loadModItems(sip.dynamicItems)
 
   sip.categories = nil
   sip.changingCategory = false
