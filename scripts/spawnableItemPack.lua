@@ -73,8 +73,11 @@ function init()
     end
   end
 
+  for k,v in pairs(sip.dynamicItems) do
+    table.insert(sip.items, v)
+  end
+
   sip.loadModItems(sip.items)
-  sip.loadModItems(sip.dynamicItems)
 
   sip.categories = nil
   sip.changingCategory = false
