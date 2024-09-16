@@ -61,8 +61,8 @@ for _, value in pairs(files) do
           path = item:gsub("/[^/]+$", "/"),
           fileName = item:match("/([^/]+)$"),
           name = itemName,
-          --I don't want "we removed this item but instead of a PGI it will turn into an equivalent item" items to clog up other categories, so set unset categories to "" rather than the item type. Consequently, the "sort by item type" functionality goes unused.
-          category = (not itemData.category and "") or (itemData.category and categories[(itemData.category or "other"):lower()] and string.lower(itemData.category)) or value,
+          --Items with no category (including objects automatically assigned the 'Other' category) and no icon go into the unsorted group, since they are likely to be technical items that don't need to be clogging up other categories. Otherwise, they go into the appropriate category
+          category = (((not itemData.category or (itemData.category == "other")) and not icon) and "") or (itemData.category and categories[(itemData.category or "other"):lower()] and string.lower(itemData.category)) or value,
           icon = icon,
           shortdescription = itemData.shortdescription or itemData.title or itemName,
           rarity = rarity,
@@ -74,8 +74,12 @@ for _, value in pairs(files) do
 end
 
 table.sort(result, function(a, b)
-  a = cutColors(a.shortdescription):gsub(" ", ""); a = a == "" and "Unnamed Item" or a
-  b = cutColors(b.shortdescription):gsub(" ", ""); b = b == "" and "Unnamed Item" or b
+  a = cutColors(a.shortdescription):gsub(" ", ""); a = a == "" and a.name or a
+  b = cutColors(b.shortdescription):gsub(" ", ""); b = b == "" and b.name or b
   return a < b
 end)
+
+local path = "/interface/sip/unsortedItemCategory.patch"
+assets.add(path, assets.json("/interface/sip/sip.config:unsortedItemCategory"))
+assets.patch("/interface/sip/categories.config", path)
 assets.add("/sipDynamicItemDump.json", result)

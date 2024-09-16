@@ -38,6 +38,7 @@ You can only select one category at once. Deselecting the current category is po
 
 ## Things to note
 * Game updates that add or remove items may cause issues, as the mod uses its own item file.
+* With [OpenStarbound](https://github.com/OpenStarbound/OpenStarbound), items from all installed mods are added.
 
 [qbm]:(https://github.com/Silverfeelin/Starbound-Quickbar-Mini)
 [qbmRelease]:(https://github.com/Silverfeelin/Starbound-Quickbar-Mini/releases)
