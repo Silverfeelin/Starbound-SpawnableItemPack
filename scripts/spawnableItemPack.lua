@@ -127,7 +127,7 @@ end
 function sip.loadModItems(itemList)
   itemList = itemList or {}
   for _,modFile in ipairs(root.assetJson("/sipMods/load.config")) do
-    local path = modFile:find("/") and modFile or ("/sipMods/" .. modFile)
+    local path = modFile:sub(1, 1) == "/" and modFile or ("/sipMods/" .. modFile)
     local items = root.assetJson(path)
     if #items > 0 then
       for i,v in ipairs(items) do

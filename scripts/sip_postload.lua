@@ -30,7 +30,8 @@ local itemDumps = assets.json("/sipMods/load.config")
 itemDumps[#itemDumps + 1] = "/sipItemDump.json"
 
 for i = 1, #itemDumps do
-  local currentItemList = assets.json(itemDumps[i])
+  local target = itemDumps[i]:sub(1, 1) == "/" and itemDumps[i] or ("/sipMods/"..itemDumps[i])
+  local currentItemList = assets.json(target)
 --sb.logInfo("Searching "..itemDumps[i])
   for k, v in pairs(currentItemList) do
     if v.name then
