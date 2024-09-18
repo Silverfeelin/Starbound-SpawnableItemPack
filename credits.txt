@@ -3,7 +3,7 @@ Special thanks to:
 Volnues - Spriting (background, printer, categories, rarities)
 NOICEMEMES - Spriting (physical element)
 RexmecK - Compatibility with Rexmeck's Item Editor Pro
-SilverSokolova - Improving object categories
+SilverSokolova - Improving object categories and OpenStarbound "add unadded items" script
 Mehgugs - Fixing missing image crash
 GTG3000 - Removing legacy code
 

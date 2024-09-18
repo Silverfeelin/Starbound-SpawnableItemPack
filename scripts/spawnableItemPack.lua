@@ -48,6 +48,7 @@ function init()
   -- Item collections
   sip.items = root.assetJson("/sipItemDump.json")
   sip.customItems = root.assetJson("/sipCustomItems.json")
+  sip.dynamicItems = root.assetJson("/sipDynamicItemDump.json")
 
   sip.queuedItems = {}
   sip.queueBuffer = status.statusProperty("sip.queueBuffer") or 50
@@ -70,6 +71,10 @@ function init()
         table.insert(sip.items, v)
       end
     end
+  end
+
+  for k,v in pairs(sip.dynamicItems) do
+    table.insert(sip.items, v)
   end
 
   sip.loadModItems(sip.items)

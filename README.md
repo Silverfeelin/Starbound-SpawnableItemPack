@@ -36,6 +36,11 @@ You can only select one category at once. Deselecting the current category is po
 * Randomize generated items before spawning them.
 * Copy existing items by dragging them on the item slot.
 
+**OpenStarbound**  
+Some features are exclusive to [OpenStarbound](https://github.com/OpenStarbound/OpenStarbound) because of the additional modding capabilities the project offers.  
+
+* Items from all installed mods are automatically added to the Spawnable Item Pack ([contribution](https://github.com/Silverfeelin/Starbound-SpawnableItemPack/pull/44) by [SilverSokolova](https://github.com/SilverSokolova)).
+
 ## Things to note
 * Game updates that add or remove items may cause issues, as the mod uses its own item file.
 

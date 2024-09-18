@@ -8,5 +8,8 @@
   "priority" : -1,
   "steamContentId" : "733665104",
   "tags" : "Crafting and Building|Cheats and God Items|User Interface|In-Game Tools",
-  "version" : "1.4.4"
+  "version" : "1.4.4.1",
+  "scripts" : {
+    "postLoad" : ["/scripts/sip_postload.lua"]
+  }
 }
