@@ -2,7 +2,7 @@ local files = {"item", "liqitem", "matitem", "miningtool", "flashlight", "wireto
 
 local paletteSwapDirective = function(color)
   local directive = "?replace"
-  for key,val in pairs(color) do
+  for key, val in pairs(color) do
     directive = directive .. ";" .. key .. "=" .. val
   end
   return directive
@@ -55,7 +55,7 @@ for _, value in pairs(files) do
 
         local icon = itemData.icon or (type(itemData.inventoryIcon) == "string" and itemData.inventoryIcon) or (itemData.inventoryIcon and itemData.inventoryIcon[1].image)
         if icon then
-          icon = icon:gsub("<directives>", "")..(itemData.colorOptions and #itemData.colorOptions > 0 and paletteSwapDirective(itemData.colorOptions[1]) or "")
+          icon = icon:gsub("<directives>", "")..(itemData.colorOptions and #itemData.colorOptions > 0 and type(itemData.colorOptions[1]) == "table" and paletteSwapDirective(itemData.colorOptions[1]) or "")
         end
 
         result[#result+1] = {
