@@ -45,30 +45,40 @@ local result = {}
 for _, value in pairs(files) do
   local items = assets.byExtension(value)
   for _, item in pairs(items) do
-    local itemData = assets.json(item)
-    if itemData["hasObjectItem"] ~= false then
-      local itemName = itemData.objectName or itemData.itemName or (itemData.id and itemData.id.."-codex")
-      if not addedItems[itemName] then
-        addedItems[itemName] = true
+    local valid, itemData = pcall(function() return assets.json(item) end)
+    if valid then
+      if itemData["hasObjectItem"] ~= false then
+        local itemName = itemData.objectName or itemData.itemName or (itemData.id and itemData.id.."-codex")
+        if not addedItems[itemName] then
+          addedItems[itemName] = true
 
-        local rarity = (itemData.rarity or "common"):lower()
+          local rarity = (itemData.rarity or "common"):lower()
 
-        local icon = itemData.icon or (type(itemData.inventoryIcon) == "string" and itemData.inventoryIcon) or (itemData.inventoryIcon and itemData.inventoryIcon[1].image)
-        if icon then
-          icon = icon:gsub("<directives>", "")..(itemData.colorOptions and #itemData.colorOptions > 0 and type(itemData.colorOptions[1]) == "table" and paletteSwapDirective(itemData.colorOptions[1]) or "")
+          local icon = itemData.icon or (type(itemData.inventoryIcon) == "string" and itemData.inventoryIcon) or (type(itemData.inventoryIcon) == "table" and itemData.inventoryIcon[1] and itemData.inventoryIcon[1].image and itemData.inventoryIcon[1].image)
+          if icon then
+            icon = icon:gsub("<directives>", "")..(itemData.colorOptions and #itemData.colorOptions > 0 and type(itemData.colorOptions[1]) == "table" and paletteSwapDirective(itemData.colorOptions[1]) or "")
+          end
+
+      --Debug code to see if any categories are missing. Use in vanilla
+      --'fuel' is intentionally omitted. See /interface/sip/categories.config for info
+      --[[
+          if not categories[(itemData.category or "other"):lower()] then
+            sb.logInfo(itemData.category or "other")
+            categories[itemData.category:lower()] = true
+          end
+        ]]
+          result[#result+1] = {
+            path = item:gsub("/[^/]+$", "/"),
+            fileName = item:match("/([^/]+)$"),
+            name = itemName,
+            --Items with no category (including objects automatically assigned the 'Other' category) and no icon go into the unsorted group, since they are likely to be technical items that don't need to be clogging up other categories. Otherwise, they go into the appropriate category
+            category = (((not itemData.category or (itemData.category == "other")) and not icon) and "") or (itemData.category and categories[(itemData.category or "other"):lower()] and string.lower(itemData.category)) or value,
+            icon = icon,
+            shortdescription = itemData.shortdescription or itemData.title or itemName,
+            rarity = rarity,
+            race = itemData.race or itemData.species or "generic"
+          }
         end
-
-        result[#result+1] = {
-          path = item:gsub("/[^/]+$", "/"),
-          fileName = item:match("/([^/]+)$"),
-          name = itemName,
-          --Items with no category (including objects automatically assigned the 'Other' category) and no icon go into the unsorted group, since they are likely to be technical items that don't need to be clogging up other categories. Otherwise, they go into the appropriate category
-          category = (((not itemData.category or (itemData.category == "other")) and not icon) and "") or (itemData.category and categories[(itemData.category or "other"):lower()] and string.lower(itemData.category)) or value,
-          icon = icon,
-          shortdescription = itemData.shortdescription or itemData.title or itemName,
-          rarity = rarity,
-          race = itemData.race or itemData.species or "generic"
-        }
       end
     end
   end
