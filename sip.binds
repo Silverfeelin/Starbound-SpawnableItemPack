@@ -5,7 +5,7 @@
     "binds": {
       "open": {
         "default": [],
-        "name": "Open UI"
+        "name": "Open"
       }
     }
   }
