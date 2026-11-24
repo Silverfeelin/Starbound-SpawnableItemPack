@@ -1,0 +1,12 @@
+{
+  "sip": {
+    "name": "Spawnable Item Pack",
+    "bannerName": "Spawnable Item Pack",
+    "binds": {
+      "open": {
+        "default": [],
+        "name": "Open"
+      }
+    }
+  }
+}
