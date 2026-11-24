@@ -11,6 +11,8 @@ require "/scripts/sip_callback.lua"
 
 --- (Event) Initializes SIP.
 function init()
+  player.setProperty("sip.paneOpen", true)
+  player.setProperty("sip.closeRequest", false)
   -- Image paths for rarity border (common) and flag (commonFlag).
   sip.rarityImages = config.getParameter("assets.rarities")
   -- Widget paths.
@@ -142,6 +144,10 @@ end
 --- (Event) Updates SIP.
 -- Updates search timer. If timer expires, show filtered items.
 function update(dt)
+  if player.getProperty("sip.closeRequest") then
+    pane.dismiss()
+    return
+  end
   sip.searchUpdate()
   sip.queuedItemUpdate()
 end
@@ -191,6 +197,8 @@ end
 
 --- (Event) Uninitializes SIP
 function uninit()
+  player.setProperty("sip.paneOpen", false)
+  player.setProperty("sip.closeRequest", false)
   status.setStatusProperty("sip.queueBuffer", sip.queueBuffer)
 end
 
