@@ -22,7 +22,7 @@ local addCategories = function(categories)
       hAnchor = "left",
       vAnchor = "top",
       zLevel = 22,
-      value = "^white,shadow;" .. groupName
+      value = "^white,shadow;" .. (config.categoryNames[groupName] or groupName)
     }
 
     i = 0
