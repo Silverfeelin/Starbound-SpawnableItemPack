@@ -49,7 +49,7 @@ for _, value in pairs(files) do
     if valid then
       if itemData["hasObjectItem"] ~= false then
         local itemName = itemData.objectName or itemData.itemName or (itemData.id and itemData.id.."-codex")
-        if not addedItems[itemName] then
+        if itemName and not addedItems[itemName] then
           addedItems[itemName] = true
 
           local rarity = (itemData.rarity or "common"):lower()
